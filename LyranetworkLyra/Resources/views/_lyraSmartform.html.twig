@@ -1,0 +1,158 @@
+{#
+* Copyright © Lyra Network.
+* This file is part of Lyra Collect plugin for Sylius. See COPYING.md for license details.
+*
+* @author    Lyra Network (https://www.lyra.com/)
+* @copyright Lyra Network
+* @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+#}
+
+{% set methodCode = '' %}
+{% if instanceCode is defined %}
+    {% set methodCode = instanceCode %}
+{% else %}
+    {% set methodCode = method.code %}
+{% endif %}
+
+{% set lyraFormConfig = lyra_get_smartform_config(methodCode) %}
+
+{% if order is defined %}
+    {% set formToken, returnUrl, popin, dataEntryMode, logoHeader = lyra_get_smartform_token(order, methodCode).formToken, path('lyra_return_url'), '', '', '' %}
+    {% if lyraFormConfig.popinMode %}
+        {% set popin = 'kr-popin' %}
+    {% endif %}
+
+    {% if lyraFormConfig.cardDataEntryMode is same as('MODE_SMARTFORM_EXT_WITH_LOGOS') or lyraFormConfig.cardDataEntryMode is same as('MODE_SMARTFORM_EXT_WITHOUT_LOGOS') %}
+        {% set dataEntryMode = 'kr-card-form-expanded' %}
+    {% endif %}
+
+    {% if lyraFormConfig.cardDataEntryMode is same as('MODE_SMARTFORM_EXT_WITHOUT_LOGOS') %}
+        {% set logoHeader = 'kr-no-card-logo-header ' %}
+    {% endif %}
+{% elseif accountToken is not empty %}
+    {% set formToken, returnUrl, popin, dataEntryMode, logoHeader = accountToken, path('lyra_sylius_account_saved_cards'), '', 'kr-card-form-expanded', '' %}
+{% endif %}
+
+<div id="lyraPaymentMethodForm">
+    <script src="{{ lyraFormConfig.jsClient }}js/krypton-client/V4.0/stable/kr-payment-form.min.js"
+        kr-public-key="{{ lyraFormConfig.pubKey }}"
+        kr-language="{{ lyraFormConfig.language }}"
+        kr-post-url-success="{{ returnUrl }}"
+        kr-post-url-refused="{{ returnUrl }}"
+    ></script>
+    <link rel="stylesheet" href="{{ lyraFormConfig.jsClient }}js/krypton-client/V4.0/ext/{{ lyraFormConfig.theme }}-reset.css">
+    <script src="{{ lyraFormConfig.jsClient }}js/krypton-client/V4.0/ext/{{ lyraFormConfig.theme }}.js"></script>
+
+    <div class="kr-smart-form" {{ popin }} {{ dataEntryMode }} {{ logoHeader }} kr-form-token="{{formToken}}" style="z-index: 3; width: 100%;"></div>
+    {% if order is defined %}
+        <script>
+            function init() {
+                const lyraCheckBox = $(".lyraPaymentCheckBox input[type='radio']");
+                const nextStepButton = $('form[name="sylius_checkout_select_payment"] button[type="submit"]');
+                if (lyraCheckBox) {
+                    configureSmartform();
+                    togglePaymentMethodTitle();
+                    if (lyraCheckBox.is(":checked")) {
+                        nextStepButton.prop('disabled', true);
+                    }
+                }
+            }
+
+            function togglePaymentMethodTitle() {
+                const popin = '{{lyraFormConfig.popinMode}}' === '1';
+                const nbMethod = $(".payment-item .checkbox input[type='radio']").length;
+                const lyraCheckBox = $(".lyraPaymentCheckBox input[type='radio']");
+                if (popin || nbMethod > 1) {
+                    $(".lyraPaymentChoiceTitle").each(function () {
+                        this.style.setProperty('display', 'flex', 'important')
+                    });
+                }
+
+                lyraCheckBox.prop("checked", true);
+            }
+
+            async function handleButtonsDisplay() {
+                $(".payment-item .checkbox input[type='radio']").on('change', handleButtonsDisplay);
+                const popin = '{{lyraFormConfig.popinMode}}' === '1';
+                const lyraCheckBox = $(".lyraPaymentCheckBox input[type='radio']");
+                const nextStepButton = $('form[name="sylius_checkout_select_payment"] button[type="submit"]');
+                let showNext = true;
+                const smartform = $('#lyraPaymentMethodForm');
+
+                nextStepButton.prop('disabled', false);
+
+                if (! popin) {
+                    $(".kr-payment-button").each(function() {
+                        this.style.setProperty('display', 'flex', 'important')
+                    });
+                    showNext = false;
+
+                    const methods = await KR.getPaymentMethods().then(function(result) {
+                        return result;
+                    });
+
+                    // If only the card form is available, hide our payment button and use Sylius button.
+                    if ((methods.paymentMethods.length == 1) && (methods.paymentMethods[0] == 'CARDS')) {
+                        $(".kr-methods-list-card-form-wrapper .kr-card-form .kr-payment-button").hide();
+                        showNext = true;
+                    }
+                }
+
+                if (showNext) {
+                    nextStepButton.show();
+                    nextStepButton.on('click', openSmartform);
+                } else {
+                    nextStepButton.hide();
+                }
+
+                if (lyraCheckBox.is(":checked")) {
+                    smartform.show();
+                } else {
+                    nextStepButton.show();
+                    smartform.hide();
+                }
+            }
+
+            function openSmartform(event) {
+                const popin = '{{lyraFormConfig.popinMode}}' === '1';
+                const paymentForm = $('form[name="sylius_checkout_select_payment"]');
+                const lyraCheckBox = $(".lyraPaymentCheckBox input[type='radio']");
+                if (lyraCheckBox.is(":checked")) {
+                    event.preventDefault();
+                    paymentForm.removeClass('loading');
+                    if (popin) {
+                        KR.openPopin();
+                    } else {
+                        KR.submit();
+                    }
+                }
+            }
+
+            function configureSmartform() {
+                if ('{{lyraFormConfig.compactMode}}') {
+                    KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
+                }
+
+                KR.setFormConfig({
+                    language: '{{lyraFormConfig.language}}',
+                    form: { smartform: { singlePaymentButton: { visibility: false }}}
+                });
+
+                KR.onFormReady(handleButtonsDisplay);
+            }
+
+            document.addEventListener("DOMContentLoaded", init, false);
+        </script>
+
+        <style>
+            .kr-smart-form-modal-button, .kr-methods-list-card-form-wrapper .kr-card-form .kr-payment-button {
+                display: none !important;
+            }
+
+            label.kr-method-label, label.kr-amount-label {
+                margin: 0 !important;
+                font-size: 13px !important;
+            }
+        </style>
+    {% endif %}
+</div>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+/**
+ * Copyright © Lyra Network.
+ * This file is part of Lyra Collect plugin for Sylius. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+ */
+-->
+
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface"
+                 class="Lyranetwork\Lyra\Repository\PaymentMethodRepository"
+                 parent="sylius.repository.payment_method">
+        </service>
+
+        <service id="Lyranetwork\Lyra\Repository\OrderRepositoryInterface"
+                 class="Lyranetwork\Lyra\Repository\OrderRepository"
+                 parent="sylius.repository.order">
+        </service>
+
+        <service id="app.sylius_payment" class="Payum\Core\Bridge\Symfony\Builder\GatewayFactoryBuilder">
+            <argument>Lyranetwork\Lyra\Payum\SyliusPaymentGatewayFactory</argument>
+            <tag name="payum.gateway_factory_builder" factory="lyra_sylius_payment" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Form\Type\SyliusGatewayConfigurationType">
+            <argument type="service" id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface" />
+            <argument type="service" id="router" />
+            <argument type="service" id="request_stack" />
+            <tag name="sylius.gateway_configuration_type" type="lyra_sylius_payment" label="sylius_lyra_plugin.ui.lyra_payment_method_title" />
+            <tag name="form.type" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\ContextProvider\ConfigurationContextProvider" class="Lyranetwork\Lyra\ContextProvider\ConfigurationContextProvider">
+            <tag name="sylius.ui.template_event.context_provider" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Service\ConfigService">
+            <argument type="service" id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Service\OrderService">
+            <argument type="service" id="Lyranetwork\Lyra\Repository\OrderRepositoryInterface" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Sdk\RestData">
+            <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
+            <argument type="service" id="logger" />
+            <argument type="service" id="router" />
+            <argument type="service" id="sylius.repository.customer" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Sdk\RefundProcessor" public="true">
+            <argument type="service" id="logger" />
+            <argument type="service" id="translator" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="sylius.repository.payment" />
+            <argument type="service" id="sylius.manager.payment" />
+            <argument key="$stateMachineFactory" type="service" id="sm.factory" />
+        </service>
+
+        <service id="sylius_lyra_plugin.twig.extension.smartform_provider" class="Lyranetwork\Lyra\Twig\Extensions\SmartformProvider">
+            <argument type="service" id="logger" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
+            <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
+            <argument type="service" id="sylius.context.currency" />
+            <argument type="service" id="sylius.context.locale" />
+            <argument key="$stateMachineFactory" type="service" id="sm.factory" />
+            <tag name="twig.extension" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\EventListener\AccountMenuListener">
+            <argument type="service" id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
+            <argument type="service" id="sylius.context.channel" />
+            <tag name="kernel.event_listener" event="sylius.menu.shop.account" method="addAccountMenuItems" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Controller\CardController" public="true">
+            <argument type="service" id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface" />
+            <argument type="service" id="sylius.repository.customer" />
+            <argument type="service" id="sylius.context.customer" />
+            <argument type="service" id="sylius.context.currency" />
+            <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
+            <argument type="service" id="router" />
+            <argument type="service" id="twig" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
+            <argument type="service" id="sylius.context.channel" />
+            <tag name="controller.service_arguments" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Controller\RefundController" public="true">
+            <argument type="service" id="sylius.repository.payment" />
+            <argument type="service" id="logger" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
+            <argument type="service" id="sylius.manager.payment" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
+            <argument type="service" id="Lyranetwork\Lyra\Sdk\RefundProcessor" />
+            <argument key="$stateMachineFactory" type="service" id="sm.factory" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Controller\OrderController" public="true" parent="sylius.controller.order">
+            <argument type="service" id="logger" />
+            <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
+            <argument type="service" id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface" />
+            <argument type="service" id="Sylius\Calendar\Provider\DateTimeProviderInterface" />
+            <argument type="service" id="translator" />
+            <argument key="$stateMachineFactory" type="service" id="sm.factory" />
+        </service>
+    </services>
+</container>

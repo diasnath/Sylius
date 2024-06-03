@@ -1,0 +1,51 @@
+{#
+* Copyright © Lyra Network.
+* This file is part of Lyra Collect plugin for Sylius. See COPYING.md for license details.
+*
+* @author    Lyra Network (https://www.lyra.com/)
+* @copyright Lyra Network
+* @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+#}
+
+<style>
+    .lyraPaymentChoiceTitle {
+        display: none !important;
+    }
+</style>
+
+{% set lyraGateway = constant('Lyranetwork\\Lyra\\Payum\\SyliusPaymentGatewayFactory::FACTORY_NAME') %}
+
+{% if method.gatewayConfig.factoryName is same as (lyraGateway) %}
+    <div class="item payment-item lyraPaymentChoice" {{ sylius_test_html_attribute('payment-item') }}>
+        <div class="field lyraPaymentChoiceTitle">
+            <div class="ui radio checkbox lyraPaymentCheckBox" {{ sylius_test_html_attribute('payment-method-checkbox') }}>
+                {{ form_widget(form, sylius_test_form_attribute('payment-method-select')) }}
+            </div>
+        </div>
+        <div class="content">
+            <a class="header lyraPaymentChoiceTitle">{{ form_label(form, null, {'label_attr': {'data-test-payment-method-label': ''}}) }}</a>
+            {% include '@LyranetworkLyraPlugin/_lyraSmartform.html.twig' %}
+            {% if method.description is not null %}
+                <div class="description">
+                    <p>{{ method.description }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% else %}
+    <div class="item payment-item" {{ sylius_test_html_attribute('payment-item') }}>
+        <div class="field">
+            <div class="ui radio checkbox" {{ sylius_test_html_attribute('payment-method-checkbox') }}>
+                {{ form_widget(form, sylius_test_form_attribute('payment-method-select')) }}
+            </div>
+        </div>
+        <div class="content">
+            <a class="header">{{ form_label(form, null, {'label_attr': {'data-test-payment-method-label': ''}}) }}</a>
+            {% if method.description is not null %}
+                <div class="description">
+                    <p>{{ method.description }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}

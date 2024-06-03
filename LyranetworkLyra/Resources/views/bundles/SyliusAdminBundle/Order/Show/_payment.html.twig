@@ -1,0 +1,56 @@
+{#
+* Copyright © Lyra Network.
+* This file is part of Lyra Collect plugin for Sylius. See COPYING.md for license details.
+*
+* @author    Lyra Network (https://www.lyra.com/)
+* @copyright Lyra Network
+* @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+#}
+
+{% import "@SyliusAdmin/Common/Macro/money.html.twig" as money %}
+{% import '@SyliusUi/Macro/labels.html.twig' as label %}
+
+{% set lyraGateway = constant('Lyranetwork\\Lyra\\Payum\\SyliusPaymentGatewayFactory::FACTORY_NAME') %}
+
+<div class="item">
+    <div class="right floated content">
+        {% include '@SyliusAdmin/Common/Label/paymentState.html.twig' with {'data': payment.state} %}
+    </div>
+    <i class="large payment icon"></i>
+    <div class="content">
+        <div class="header">
+            {{ payment.method }}
+        </div>
+        <div class="description">
+            {{ money.format(payment.amount, payment.order.currencyCode) }}
+            {% if payment.details['lyra_factory_name'] is defined and payment.details['lyra_factory_name'] is same as (lyraGateway) %}
+                {% include '@LyranetworkLyraPlugin/_lyraPaymentDetails.html.twig' %}
+            {% endif %}
+        </div>
+    </div>
+    {% if sm_can(payment, 'complete', 'sylius_payment') %}
+        <div class="ui segment">
+            <form action="{{ path('sylius_admin_order_payment_complete', {'orderId': order.id, 'id': payment.id}) }}" method="post" novalidate>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token(payment.id) }}" />
+                <input type="hidden" name="_method" value="PUT">
+                <button type="submit" class="ui icon labeled tiny blue fluid loadable button"><i class="check icon"></i> {{ 'sylius.ui.complete'|trans }}</button>
+            </form>
+        </div>
+    {% endif %}
+    {% if sm_can(payment, 'refund', 'sylius_payment') %}
+        <div class="ui segment">
+            <form
+            {% if payment.details['lyra_factory_name'] is defined and payment.details['lyra_factory_name'] is same as (lyraGateway) %}
+                 action="{{ path('lyra_payment_refund', {'orderId': order.id, 'id': payment.id}) }}"
+            {% else %}
+                action="{{ path('sylius_admin_order_payment_refund', {'orderId': order.id, 'id': payment.id}) }}"
+            {% endif %}
+            method="post" novalidate>
+                <input type="hidden" name="_method" value="PUT">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token(payment.id) }}" />
+                <input type="hidden" name="admin_locale" value="{{ app.locale }}" />
+                <button type="submit" class="ui icon labeled tiny yellow fluid loadable button"><i class="reply all icon"></i> {{ 'sylius.ui.refund'|trans }}</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
