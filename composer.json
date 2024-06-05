@@ -67,7 +67,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Lyranetwork\\Lyra\\": "src/",
+            "Lyranetwork\\Lyra\\": "LyranetworkLyra/src/",
             "Tests\\Acme\\SyliusExamplePlugin\\": "tests/"
         }
     },
