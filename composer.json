@@ -1,5 +1,5 @@
 {
-    "name" : "lyranetwork/sylius-lyra-plugin",
+    "name" : "lyranetwork/sylius-lyranetwork-plugin",
     "description" : "This plugin enables you to setup the Lyra Collect payment gateway on your Sylius website.",
     "version" : "1.0.0",
     "type": "sylius-plugin",
