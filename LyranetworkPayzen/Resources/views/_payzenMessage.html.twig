@@ -1,0 +1,45 @@
+{#
+ * Copyright © Lyra Network.
+ * This file is part of PayZen plugin for Sylius. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+ #}
+
+<div class="ui message">
+    <div class="ui grid">
+        <div class="eight wide column">
+            <h2 class="ui header aligned left">
+                PayZen
+            </h2>
+        </div>
+    </div>
+    <div class="ui grid">
+        <div class="four wide column">
+            {{ 'sylius_payzen_plugin.ui.payzen_developed_by'|trans }}
+            <b><a href="https://www.lyra.com/" target="_blank">Lyra Network</a></b>
+        </div>
+        <div class="eight wide column">
+            <i class="envelope icon"></i>
+            {{ 'sylius_payzen_plugin.ui.payzen_support_email'|trans }}
+            <b><a href="mailto:{{ payzenSupport }}">{{ payzenSupport }}</a></b>
+        </div>
+    </div>
+    <div class="ui grid">
+        <div class="four wide column">
+            {{ 'sylius_payzen_plugin.ui.payzen_module_version'|trans }} <b>{{ payzenPluginVersion }}</b>
+        </div>
+        <div class="four wide column">
+            {{ 'sylius_payzen_plugin.ui.payzen_gateway_version'|trans }} <b>{{ payzenGatewayVersion }}</b>
+        </div>
+    </div>
+    <div class="ui grid">
+        <div class="twelve wide column">
+            {{ 'sylius_payzen_plugin.ui.payzen_documentation_link'|trans }}
+            {% for lang, url in payzenDocUrls %}
+                <a style="margin-left: 10px; font-weight: bold; text-transform: uppercase;" href="{{ url }}" target="_blank">{{ lang }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
