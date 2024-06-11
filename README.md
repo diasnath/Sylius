@@ -4,25 +4,35 @@ Lyra Collect for Sylius is an open source plugin that links e-commerce websites 
 
 ## Installation & Upgrade
 
-- Unzip module in your Sylius root folder.
-- Add the following line in  __bundles.php__  file located in `sylius/config/`:
+### With Composer
+- Require the plugin with composer using the following command:
 
 ```
-Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
+composer require lyranetwork\sylius-lyranetwork-plugin dev-lyra
 ```
+### With module zip file
+- Unzip module in your Sylius root folder.
 - Add in file `sylius/composer.json`, in autoload psr-4 the line:
 
 ```
 "Lyranetwork\\Lyra\\": "LyranetworkLyra/src/"
 ```
+
+### Add module to bundles
+- Add the following line in  __bundles.php__  file located in `sylius/config/`:
+
+```
+Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
+```
+
 - Add Lyra routes in `config/routes.yaml`
 
-   ```yaml
-   sylius_lyra:
-      resource: "@LyranetworkLyraPlugin/Resources/config/routing.yaml"
-   ```
+ ```yaml
+ sylius_lyra:
+    resource: "@LyranetworkLyraPlugin/Resources/config/routing.yaml"
+ ```
 
-- Open command line in Sylius root directory, and run the following commands:
+- Open command line in Sylius root directory, and run the following commands to extract the translations for the plugin:
 
 ```
 composer dump-autoload
@@ -33,12 +43,33 @@ php bin/console translation:extract es LyranetworkLyraPlugin --dump-messages
 php bin/console translation:extract de LyranetworkLyraPlugin --dump-messages
 php bin/console translation:extract pt LyranetworkLyraPlugin --dump-messages
 php bin/console translation:extract br LyranetworkLyraPlugin --dump-messages
+```
+**Careful**
 
+- Add the overrode templates. If you have already overrode one of the following files, you need to merge it with ours. You will find them in LyranetworkLyra/Resources/views/bundles/ directories.
+
+```
+SyliusAdminBundle\PaymentMethod\_form.html.twig
+SyliusAdminBundle\OrderShow\_payment.html.twig
+SyliusShopBundle\Checkout\SelectPayment\_choice.html.twig
+SyliusUiBundle\Form\theme.html.twig
+```
+- If not, just copy them with the following command, if you used the zip method to install:
+
+```
 cp -R LyranetworkLyra/Resources/views/bundles/* templates/bundles/
+```
+- Or this one if you used composer :
 
+```
+cp -R vendor/lyranetwork/sylius-lyranetwork-plugin/LyranetworkLyra/Resources/views/bundles/* templates/bundles/
+```
+- Empty the cache with the following command:
+
+```
 php bin/console cache:clear
 ```
-The plugin should be now available in the list of payment methods that you can create. 
+The plugin should be now available in the list of payment methods that you can create.
 
 ## Configuration
 In the Sylius administration interface:
@@ -50,32 +81,42 @@ In the Sylius administration interface:
 
 ## Uninstallation
 
-- Delete LyranetworkLyra folder in your root Sylius folder
-- Remove the following line in  __bundles.php__  file located in `sylius/config/`:
+### With composer
+```
+composer remove lyranetwork/sylius-lyranetwork-plugin
+```
 
-```
-Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
-```
+### With module zip file
+- Delete LyranetworkLyra folder in your Sylius root folder
 - Remove in file `sylius/composer.json`, in autoload psr-4 the line:
 
 ```
 "Lyranetwork\\Lyra\\": "LyranetworkLyra/src/"
 ```
+
+### Remove and revert changes
+- Remove the following line in  __bundles.php__  file located in `sylius/config/`:
+
+```
+Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
+```
+
 - Remove Lyra routes in `config/routes.yaml`
 
 ```yaml
  sylius_lyra:
     resource: "@LyranetworkLyraPlugin/Resources/config/routing.yaml"
 ```
-- Remove all added template files in `templates/bundles/`
+
+- Remove or unmerge all added template files in `templates/bundles/`
 
 ```
 SyliusAdminBundle\PaymentMethod\_form.html.twig
-SyliusAdminBundle\PaymentMethod\_lyraMessage.html.twig
+SyliusAdminBundle\OrderShow\_payment.html.twig
 SyliusShopBundle\Checkout\SelectPayment\_choice.html.twig
-SyliusShopBundle\Checkout\SelectPayment\_lyraSmartform.html.twig
 SyliusUiBundle\Form\theme.html.twig
 ```
+
 - Open command line in Sylius root directory, and run the following commands:
 
 ```
