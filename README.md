@@ -5,19 +5,22 @@ PayZen for Sylius is an open source plugin that links e-commerce websites based 
 ## Installation & Upgrade
 
 ### With Composer
-- Require the plugin with composer
+- Require the plugin with composer using the following command:
+
 ```
 composer require lyranetwork\sylius-lyranetwork-plugin dev-payzen
 ```
 ### With module zip file
 - Unzip module in your Sylius root folder.
 - Add in file `sylius/composer.json`, in autoload psr-4 the line:
+
 ```
 "Lyranetwork\\Payzen\\": "LyranetworkPayzen/src/"
 ```
 
 ### Add module to bundles
 - Add the following line in  __bundles.php__  file located in `sylius/config/`:
+
 ```
 Lyranetwork\Payzen\LyranetworkPayzenPlugin::class => ['all' => true],
 ```
@@ -51,21 +54,21 @@ SyliusAdminBundle\OrderShow\_payment.html.twig
 SyliusShopBundle\Checkout\SelectPayment\_choice.html.twig
 SyliusUiBundle\Form\theme.html.twig
 ```
+- If not, just copy them with the following command, if you used the zip method to install:
 
-- If not, just copy them with the following command if you used the zip method to install:
 ```
 cp -R LyranetworkPayzen/Resources/views/bundles/* templates/bundles/
 ```
 - Or this one if you used composer :
+
 ```
 cp -R vendor/lyranetwork/sylius-lyranetwork-plugin/LyranetworkPayzen/Resources/views/bundles/* templates/bundles/
 ```
-
 - Empty the cache with the following command:
+
 ```
 php bin/console cache:clear
 ```
-
 The plugin should be now available in the list of payment methods that you can create.
 
 ## Configuration
@@ -84,25 +87,29 @@ composer remove lyranetwork/sylius-lyranetwork-plugin
 ```
 
 ### With module zip file
-- Delete LyranetworkPayzen folder in your root Sylius folder
+- Delete LyranetworkPayzen folder in your Sylius root folder
 - Remove in file `sylius/composer.json`, in autoload psr-4 the line:
+
 ```
 "Lyranetwork\\Payzen\\": "LyranetworkPayzen/src/"
 ```
 
 ### Remove and revert changes
 - Remove the following line in  __bundles.php__  file located in `sylius/config/`:
+
 ```
 Lyranetwork\Payzen\LyranetworkPayzenPlugin::class => ['all' => true],
 ```
 
 - Remove Payzen routes in `config/routes.yaml`
+
 ```yaml
  sylius_payzen:
     resource: "@LyranetworkPayzenPlugin/Resources/config/routing.yaml"
 ```
 
 - Remove or unmerge all added template files in `templates/bundles/`
+
 ```
 SyliusAdminBundle\PaymentMethod\_form.html.twig
 SyliusAdminBundle\OrderShow\_payment.html.twig
@@ -111,6 +118,7 @@ SyliusUiBundle\Form\theme.html.twig
 ```
 
 - Open command line in Sylius root directory, and run the following commands:
+
 ```
 composer dump-autoload
 php bin/console cache:clear
