@@ -11,8 +11,8 @@
 declare(strict_types=1);
 namespace Lyranetwork\Lyra\Service;
 
-use Lyranetwork\Lyra\Payum\SyliusPaymentGatewayFactory;
 use Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface;
+use Lyranetwork\Lyra\Sdk\Tools;
 
 class ConfigService
 {
@@ -30,7 +30,7 @@ class ConfigService
 
     public function get(string $configId, string $instanceCode)
     {
-        $paymentMethod = $this->paymentMethodRepository->findByGatewayNameAndCode(SyliusPaymentGatewayFactory::FACTORY_NAME, $instanceCode);
+        $paymentMethod = $this->paymentMethodRepository->findByGatewayNameAndCode(Tools::FACTORY_NAME, $instanceCode);
 
         if (! $paymentMethod) {
             return "";

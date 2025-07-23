@@ -100,7 +100,7 @@ class CardController
 
     public function savedCardsAction(Request $request)
     {
-        $gatewayName = constant('Lyranetwork\Lyra\Payum\SyliusPaymentGatewayFactory::FACTORY_NAME');
+        $gatewayName = constant('Lyranetwork\Lyra\Sdk\Tools::FACTORY_NAME');
         $lyraPaymentMethods = $this->paymentMethodRepository->findAllByGatewayName($gatewayName);
         $walletAllowed = false;
 
@@ -126,6 +126,6 @@ class CardController
         $cust = $this->customerRepository->find($customer->getId());
         $accountToken = $this->restData->getAccountToken($cust, $this->currencyContext->getCurrencyCode(), $instanceCode);
 
-        return new Response($this->twig->render('@LyranetworkLyraPlugin/card/cards.html.twig', ['accountToken' => $accountToken, 'instanceCode' => $instanceCode]));
+        return new Response($this->twig->render('@LyranetworkLyraPlugin/shop/account/saved_cards.html.twig', ['accountToken' => $accountToken, 'instanceCode' => $instanceCode]));
     }
 }

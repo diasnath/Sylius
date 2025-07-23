@@ -103,9 +103,9 @@ class Api
     public static function getSupportedCurrencies()
     {
         $currencies = array(
-            array('CAD', '124', 2), array('CHF', '756', 2), array('DKK', '208', 2), array('EUR', '978', 2),
-            array('GBP', '826', 2), array('JPY', '392', 0), array('NOK', '578', 2), array('PLN', '985', 2),
-            array('SEK', '752', 2), array('USD', '840', 2)
+            array('AUD', '036', 2), array('CAD', '124', 2), array('CHF', '756', 2), array('DKK', '208', 2),
+            array('EUR', '978', 2), array('GBP', '826', 2), array('JPY', '392', 0), array('MXN', '484', 2),
+            array('NOK', '578', 2), array('PLN', '985', 2), array('SEK', '752', 2), array('USD', '840', 2)
         );
 
         $supported_currencies = array();
@@ -203,40 +203,54 @@ class Api
             'CB' => 'CB', 'E-CARTEBLEUE' => 'e-Carte Bleue', 'MAESTRO' => 'Maestro', 'MASTERCARD' => 'Mastercard',
             'VISA' => 'Visa', 'VISA_ELECTRON' => 'Visa Electron', 'VPAY' => 'V PAY', 'AMEX' => 'American Express',
             'ACCORD_STORE' => 'Cartes Enseignes Partenaires', 'ACCORD_STORE_SB' => 'Cartes Enseignes Partenaires (sandbox)',
+            'AKULAKU_ID' => 'Akulaku PayLater ID', 'AKULAKU_PH' => 'Akulaku PayLater PH',
             'ALINEA' => 'Carte myalinea', 'ALINEA_CDX' => 'Carte Cadeau Alinéa', 'ALINEA_CDX_SB' => 'Carte Cadeau Alinéa (sandbox)',
-            'ALINEA_SB' => 'Carte myalinea (sandbox)', 'ALIPAY' => 'Alipay', 'ALLOBEBE_CDX' => 'Carte Cadeau Allobébé',
+            'ALINEA_SB' => 'Carte myalinea (sandbox)', 'ALIPAY' => 'Alipay', 'ALIPAY_CN' => 'AlipayCN',
+            'ALIPAY_HK' => 'AlipayHK', 'ALIPAY_PLUS' => 'Alipay+', 'ALLOBEBE_CDX' => 'Carte Cadeau Allobébé',
             'ALLOBEBE_CDX_SB' => 'Carte Cadeau Allobébé (sandbox)', 'ALMA' => 'Alma en 1 fois', 'ALMA_10X' => 'Alma en 10 fois',
             'ALMA_12X' => 'Alma en 12 fois', 'ALMA_2X' => 'Alma en 2 fois', 'ALMA_3X' => 'Alma en 3 fois',
             'ALMA_4X' => 'Alma en 4 fois', 'APETIZ' => 'Apetiz', 'APPLE_PAY' => 'Apple Pay',
             'AUCHAN' => 'Carte Auchan', 'AUCHAN_SB' => 'Carte Auchan (sandbox)', 'AURORE-MULTI' => 'Cpay Aurore',
-            'BANCONTACT' => 'Bancontact Mistercash', 'BIZUM' => 'Bizum', 'BIZZBEE_CDX' => 'Carte Cadeau Bizzbee',
-            'BIZZBEE_CDX_SB' => 'Carte Cadeau Bizzbee (sandbox)', 'BOULANGER' => 'Carte b+', 'BOULANGER_SB' => 'Carte b+ (sandbox)',
-            'BRICE_CDX' => 'Carte Cadeau Brice', 'BRICE_CDX_SB' => 'Carte Cadeau Brice (sandbox)', 'BUT' => 'But',
-            'CABAL' => 'Cabal', 'CARNET' => 'Carnet', 'CA_DO_CARTE' => 'CA DO Carte', 'CHQ_DEJ' => 'Chèque Déjeuner',
+            'BANCONTACT' => 'Bancontact Mistercash', 'BILLEASE' => 'BillEase', 'BIZUM' => 'Bizum', 'BIZZBEE_CDX' => 'Carte Cadeau Bizzbee',
+            'BIZZBEE_CDX_SB' => 'Carte Cadeau Bizzbee (sandbox)', 'BOOST' => 'Boost', 'BOULANGER' => 'Carte b+',
+            'BOULANGER_SB' => 'Carte b+ (sandbox)', 'BPI' => 'BPI', 'BRICE_CDX' => 'Carte Cadeau Brice',
+            'BRICE_CDX_SB' => 'Carte Cadeau Brice (sandbox)', 'BUT' => 'But', 'CABAL' => 'Cabal', 'CARNET' => 'Carnet',
+            'CA_DO_CARTE' => 'CA DO Carte', 'CHQ_DEJ' => 'Chèque Déjeuner',
+            'COFIDIS_3X_BE' => 'Cofidis en 3 fois', 'COFIDIS_3X_FR' => 'Cofidis en 3 fois',
+            'COFIDIS_4X_ES' => 'Cofidis en 4 vencimientos', 'COFIDIS_4X_FR' => 'Cofidis en 4 fois', 'COFIDIS_DFPAY_FR' => 'Cofidis Pay Later',
+            'COFIDIS_LOAN_BE' => 'Cofidis en 6-12-18 fois', 'COFIDIS_LOAN_CB' => 'Cofidis en 5-12 fois',
+            'COFIDIS_LOAN_ES' => 'Cofidis en 6-12-24 vencimientos', 'COFIDIS_LOAN_FR' => 'Amortissable', 'COFIDIS_LOAN_IT' => 'Cofidis Pagodil',
+            'COFIDIS_PAY_FR' => 'Cofidis Pay', 
             'COM_BARRY_CDX' => 'Carte Cadeau Comtesse du Barry', 'COM_BARRY_CDX_SB' => 'Carte Cadeau Comtesse du Barry (sandbox)',
             'CONECS' => 'Conecs', 'CONFORAMA' => 'Conforama', 'CORA' => 'Cora', 'CORA_BLANCHE' => 'Cora blanche',
-            'CORA_PREM' => 'Cora Visa Premier', 'CORA_VISA' => 'Cora Visa', 'CVCO' => 'Chèque-Vacances Connect',
+            'CORA_PREM' => 'Cora Visa Premier', 'CORA_VISA' => 'Cora Visa', 'CVCO' => 'Chèque-Vacances Connect', 'DANA' => 'Dana',
             'DINERS' => 'Diners', 'DISCOVER' => 'Discover', 'ECCARD' => 'EC Card', 'EDENRED' => 'Ticket Restaurant',
-            'EDENRED_EC' => 'Ticket EcoCheque', 'EDENRED_SC' => 'Ticket Sport & Culture',
+            'EDENRED_CC' => 'Ticket Cheque Consommation', 'EDENRED_EC' => 'Ticket EcoCheque', 'EDENRED_SC' => 'Ticket Sport & Culture',
             'EDENRED_TC' => 'Ticket Compliments', 'EDENRED_TR' => 'Ticket Restaurant', 'ELO' => 'Elo',
-            'FRANFINANCE_3X' => 'Paiement en 3 fois', 'FRANFINANCE_4X' => 'Paiement en 4 fois',
-            'FULLCB3X' => 'Paiement en 3 fois CB', 'FULLCB4X' => 'Paiement en 4 fois CB', 'GEMO_CDX' => 'Carte Cadeau Gémo',
-            'GEMO_CDX_SB' => 'Carte Cadeau Gémo (sandbox)', 'GIROPAY' => 'Giropay', 'HIPER' => 'Hiper',
-            'HIPERCARD' => 'Hipercard', 'IDEAL' => 'iDEAL', 'ILLICADO' => 'Carte Illicado',
-            'ILLICADO_SB' => 'Carte Illicado (sandbox)', 'IP_WIRE' => 'Virement SEPA', 'IP_WIRE_INST' => 'Virement SEPA Instantané',
-            'JCB' => 'JCB', 'JOUECLUB_CDX' => 'Carte Cadeau Joué Club', 'JOUECLUB_CDX_SB' => 'Carte Cadeau Joué Club (sandbox)',
-            'JULES_CDX' => 'Carte Cadeau Jules', 'JULES_CDX_SB' => 'Carte Cadeau Jules (sandbox)',
-            'KADEOS_CULTURE' => 'Carte Kadéos Culture', 'KADEOS_GIFT' => 'Carte Kadéos Zénith', 'LECLERC' => 'Carte Reglo',
+            'FLOA_10X' => 'Floa en 10 fois', 'FLOA_3X' => 'Floa en 3 fois', 'FLOA_4X' => 'Floa en 4 fois',
+            'FLOA_PAYLATER' => 'Floa Pay Later', 'FRANFINANCE_3X' => 'Paiement en 3 fois', 'FRANFINANCE_4X' => 'Paiement en 4 fois',
+            'FULLCB3X' => 'Paiement en 3 fois CB', 'FULLCB4X' => 'Paiement en 4 fois CB', 'GCASH' => 'GCash',
+            'GEMO_CDX' => 'Carte Cadeau Gémo', 'GEMO_CDX_SB' => 'Carte Cadeau Gémo (sandbox)', 'GIROPAY' => 'Giropay',
+            'GOOGLEPAY' => 'Google Pay', 'HIPER' => 'Hiper', 'HIPERCARD' => 'Hipercard', 'IDEAL' => 'iDEAL',
+            'ILLICADO' => 'Carte Illicado', 'ILLICADO_SB' => 'Carte Illicado (sandbox)', 'IP_WIRE' => 'Virement SEPA',
+            'IP_WIRE_INST' => 'Virement SEPA Instantané', 'JCB' => 'JCB', 'JOUECLUB_CDX' => 'Carte Cadeau Joué Club',
+            'JOUECLUB_CDX_SB' => 'Carte Cadeau Joué Club (sandbox)', 'JULES_CDX' => 'Carte Cadeau Jules',
+            'JULES_CDX_SB' => 'Carte Cadeau Jules (sandbox)', 'KADEOS_CULTURE' => 'Carte Kadéos Culture',
+            'KADEOS_GIFT' => 'Carte Kadéos Zénith', 'KAKAOPAY' => 'Kakao Pay', 'KREDIVO_ID' => 'Krevido', 'LECLERC' => 'Carte Reglo',
             'LEROY-MERLIN' => 'Carte Maison Financement', 'LEROY-MERLIN_SB' => 'Carte Maison Financement (sandbox)',
-            'MASTERPASS' => 'MasterPass', 'MC_CORDOBESA' => 'Mastercard Cordobesa', 'MULTIBANCO' => 'Multibanco',
-            'MYBANK' => 'MyBank', 'NARANJA' => 'Naranja', 'NORAUTO' => 'Carte Norauto option Financement',
-            'NORAUTO_SB' => 'Carte Norauto option Financement (sandbox)', 'ONEY_10X_12X' => 'Paiement en 10 ou 12 fois Oney',
-            'ONEY_3X_4X' => 'Paiement en 3 ou 4 fois Oney', 'ONEY_ENSEIGNE' => 'Cartes enseignes Oney',
-            'ONEY_PAYLATER' => 'Pay Later Oney', 'PAYCONIQ' => 'Payconiq', 'PAYDIREKT' => 'Paydirekt', 'PAYPAL' => 'PayPal',
+            'MASTERPASS' => 'MasterPass', 'MAYA' => 'Maya', 'MB_WAY' => 'MB Way', 'MC_CORDOBESA' => 'Mastercard Cordobesa',
+            'MPAY' => 'MPay', 'MULTIBANCO' => 'Multibanco', 'MYBANK' => 'MyBank', 'NARANJA' => 'Naranja',
+            'NORAUTO' => 'Carte Norauto option Financement', 'NORAUTO_SB' => 'Carte Norauto option Financement (sandbox)',
+            'ONEY_10X_12X' => 'Paiement en 10 ou 12 fois Oney', 'ONEY_3X_4X' => 'Paiement en 3 ou 4 fois Oney',
+            'ONEY_ENSEIGNE' => 'Cartes enseignes Oney', 'ONEY_PAYLATER' => 'Pay Later Oney', 'PASS_BEAU_CDX' => 'Carte Cadeau Passion Beauté',
+            'PASS_BEAU_CDX_SB' => 'Carte Cadeau Passion Beauté (sandbox)', 'PAYCONIQ' => 'Payconiq', 'PAYDIREKT' => 'Paydirekt',
+            'PAYPAL' => 'PayPal', 'PAYPAL_BNPL' => 'PayPal Pay Later', 'PAYPAL_BNPL_SB' => 'PayPal Pay Later Sandbox',
             'PAYPAL_SB' => 'PayPal Sandbox', 'PICWIC' => 'Carte Picwic', 'PICWIC_SB' => 'Carte Picwic (sandbox)',
             'POSTFINANCE' => 'PostFinance Card', 'POSTFINANCE_EFIN' => 'PostFinance E-Finance', 'PRESTO' => 'Presto',
-            'PRZELEWY24' => 'Przelewy24', 'S-MONEY' => 'S-money', 'SCT' => 'Virement SEPA', 'SDD' => 'SEPA direct debit',
-            'SODEXO' => 'Pass Restaurant', 'SOFORT_BANKING' => 'Sofort', 'SOROCRED' => 'Sorocred', 'UNION_PAY' => 'UnionPay',
+            'PRZELEWY24' => 'Przelewy24', 'RABBIT_LINE_PAY' => 'Rabbit Line Pay', 'S-MONEY' => 'S-money',
+            'SAMSUNG_PAY' => 'Samsung Pay', 'SCT' => 'Virement SEPA',
+            'SDD' => 'SEPA direct debit', 'SODEXO' => 'Pass Restaurant', 'SOFORT_BANKING' => 'Sofort', 'SOROCRED' => 'Sorocred',
+            'TNG' => 'Touch \'n Go eWallet', 'TOSS' => 'Toss', 'TRUEMONEY' => 'TrueMoney Wallet',
             'UPI' => 'UPI', 'VILLAVERDE' => 'Carte Cadeau VillaVerde', 'VILLAVERDE_SB' => 'Carte Cadeau VillaVerde (sandbox)', 'WECHAT' => 'WeChat Pay'
         );
     }
@@ -354,37 +368,47 @@ class Api
     }
 
     /**
-     * Format a given list of e-mails separated by commas and render them as HTML links.
-     * @param string $emails
+     * Format a given list of e-mails / URLs separated by commas and render them as HTML links.
+     * @param string $links
      * @return string
      */
-    public static function formatSupportEmails($emails)
+    public static function formatSupportEmails($links, $label = "Click here")
     {
         $formatted = '';
 
-        $parts = explode(', ', $emails);
+        $parts = explode(', ', $links);
         foreach ($parts as $part) {
-            $elts = explode(':', $part);
-            if (count($elts) === 2) {
-                $label = trim($elts[0]) . ': ';
-                $email = $elts[1];
-            } elseif (count($elts) === 1) {
-                $label = '';
-                $email = $elts[0];
+            if (strpos($part, '@')) {
+                $elts = explode(':', $part);
+                if (count($elts) === 2) {
+                    $label = trim($elts[0]) . ': ';
+                    $email = $elts[1];
+                } elseif (count($elts) === 1) {
+                    $label = '';
+                    $email = $elts[0];
+                } else {
+                    throw new \InvalidArgumentException("Invalid support e-mails string passed: {$links}.");
+                }
+
+                $email = trim($email);
+
+                if (! empty($formatted)) {
+                    $formatted .= '<br />';
+                }
+
+                $formatted .= $label . '<a href="mailto:' . $email . '">' . $email . '</a>';
             } else {
-                throw new \InvalidArgumentException("Invalid support e-mails string passed: {$emails}.");
+                $link = trim($part);
+                $formatted .= '<a href="'. $link.'" target="_blank" rel="noopener noreferrer">' . $label . '</a>';
             }
-
-            $email = trim($email);
-
-            if (! empty($formatted)) {
-                $formatted .= '<br />';
-            }
-
-            $formatted .= $label . '<a href="mailto:' . $email . '">' . $email . '</a>';
         }
 
         return $formatted;
+    }
+
+    public static function getSupportComponentEmail()
+    {
+        return '###COMPONENT_EMAIL###';
     }
 
     /**

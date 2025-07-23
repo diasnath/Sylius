@@ -21,3 +21,15 @@ lyra_sylius_account_saved_cards:
   methods: [POST, GET]
   defaults:
     _controller: 'Lyranetwork\Lyra\Controller\CardController::savedCardsAction'
+
+lyra_rest_form_token:
+  path: /lyra/rest/formtoken
+  methods: [POST]
+  defaults:
+    _controller: 'Lyranetwork\Lyra\Controller\OrderController::getFormToken'
+
+lyra_headless_return_url:
+  path: /lyra/rest/headless/return
+  methods: [POST, GET]
+  defaults:
+    _controller: 'Lyranetwork\Lyra\Controller\OrderController::paymentResponseAction'

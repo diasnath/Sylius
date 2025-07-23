@@ -14,6 +14,14 @@ namespace Lyranetwork\Lyra\Service;
 
 use Lyranetwork\Lyra\Repository\OrderRepositoryInterface;
 
+use Sylius\Bundle\CoreBundle\Mailer\OrderEmailManagerInterface;
+use App\Entity\Payment\Payment;
+use Symfony\Component\HttpClient\Exception\TransportException;
+
+use Webmozart\Assert\Assert;
+
+use Psr\Log\LoggerInterface;
+
 class OrderService
 {
     /**
@@ -21,11 +29,25 @@ class OrderService
      */
     private $orderRepository;
 
+    /**
+     * @var OrderEmailManagerInterface
+     */
+    private $orderEmailManager;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     public function __construct(
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        OrderEmailManagerInterface $orderEmailManager,
+        LoggerInterface $logger
     )
     {
         $this->orderRepository = $orderRepository;
+        $this->orderEmailManager = $orderEmailManager;
+        $this->logger = $logger;
     }
 
     public function get(string $orderId)
@@ -36,5 +58,29 @@ class OrderService
     public function getByNumber(string $orderNumber)
     {
         return $this->orderRepository->findOneByNumber($orderNumber);
+    }
+
+    public function sendConfirmationEmail(Payment $payment): void
+    {
+        try {
+            Assert::isInstanceOf($payment, Payment::class);
+
+            $gatewayName = constant('Lyranetwork\Lyra\Sdk\Tools::FACTORY_NAME');
+            $factoryName = $payment->getMethod()->getGatewayConfig()->getFactoryName();
+            if ($gatewayName === $factoryName) {
+                $order = $payment->getOrder();
+
+                $this->logger->info("Sending confirmation email for order: " . $order->getNumber());
+
+                $this->orderEmailManager->sendConfirmationEmail($order);
+            }
+        } catch (TransportException $e) {
+            $this->logger->error($e->getMessage());
+        }
+    }
+
+    public function getByTokenValue($tokenValue)
+    {
+        return $this->orderRepository->findOneByTokenValue($tokenValue);
     }
 }

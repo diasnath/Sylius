@@ -17,11 +17,10 @@ use Lyranetwork\Lyra\Sdk\Refund\Processor;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-use Sylius\Component\Core\Repository\PaymentRepositoryInterface;
+use Sylius\Component\Core\Repository\OrderRepositoryInterface;
 use Sylius\Component\Payment\PaymentTransitions;
 use Sylius\Component\Core\Model\PaymentInterface;
-
-use SM\Factory\FactoryInterface;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
 
 use Psr\Log\LoggerInterface;
 
@@ -33,27 +32,27 @@ class RefundProcessor implements Processor
 
     private RequestStack $requestStack;
 
-    private PaymentRepositoryInterface $paymentRepository;
+    private OrderRepositoryInterface $orderRepository;
 
     private EntityManagerInterface $paymentEntityManager;
 
-    private FactoryInterface $stateMachineFactory;
+    private StateMachineInterface $stateMachine;
 
     public function __construct(
         LoggerInterface $logger,
         TranslatorInterface $translator,
         RequestStack $requestStack,
-        PaymentRepositoryInterface $paymentRepository,
+        OrderRepositoryInterface $orderRepository,
         EntityManagerInterface $paymentEntityManager,
-        FactoryInterface $stateMachineFactory
+        StateMachineInterface $stateMachine
     )
     {
         $this->logger = $logger;
         $this->translator = $translator;
         $this->requestStack = $requestStack;
-        $this->paymentRepository = $paymentRepository;
+        $this->orderRepository = $orderRepository;
         $this->paymentEntityManager = $paymentEntityManager;
-        $this->stateMachineFactory = $stateMachineFactory;
+        $this->stateMachine = $stateMachine;
     }
 
     /**
@@ -65,6 +64,7 @@ class RefundProcessor implements Processor
         if ($errorCode === 'privateKey') {
             $this->requestStack->getSession()->getFlashBag()->add('error', $this->translate("sylius_lyra_plugin.refund.error.private_key"));
         } else {
+            $message .= " " . sprintf($this->translate("sylius_lyra_plugin.refund.error.backoffice_action"), Tools::getDefault('BACKOFFICE_NAME'));
             $this->requestStack->getSession()->getFlashBag()->add('error', $message);
         }
     }
@@ -75,19 +75,28 @@ class RefundProcessor implements Processor
      */
     public function doOnSuccess($operationResponse, $operationType)
     {
-        if (isset($operationResponse['metadata']['db_payment_id'])) {
-            $db_payment_id = $operationResponse['metadata']['db_payment_id'];
-            $payment = $this->paymentRepository->find($db_payment_id);
-            $stateMachine = $this->stateMachineFactory->get($payment, PaymentTransitions::GRAPH);
+        if (isset($operationResponse['metadata']['db_order_id']) && (isset($operationResponse['uuid']) || isset($operationResponse['transactionDetails']['parentTransactionUuid']))) {
+            $db_order_id = $operationResponse['metadata']['db_order_id'];
+            $order = $this->orderRepository->find($db_order_id);
 
-            if ($stateMachine->can(PaymentTransitions::TRANSITION_REFUND)) {
-                $stateMachine->apply(PaymentTransitions::TRANSITION_REFUND);
+            $transactionUuid = $operationResponse['detailedStatus'] === 'CANCELLED' ? $operationResponse['uuid'] : $operationResponse['transactionDetails']['parentTransactionUuid'];
+            foreach ($order->getPayments() as $payment) {
+                if ($transactionUuid === $payment->getDetails()["lyra_trans_uuid"]) {
+                    $paymentToRefund = $payment;
+                    break;
+                }
             }
 
-            $this->paymentEntityManager->flush();
-            $this->requestStack->getSession()->getFlashBag()->add('success', 'sylius.payment.refunded');
+            if (isset($paymentToRefund)) {
+                if ($this->stateMachine->can($paymentToRefund, PaymentTransitions::GRAPH, PaymentTransitions::TRANSITION_REFUND)) {
+                    $this->stateMachine->apply($paymentToRefund, PaymentTransitions::GRAPH, PaymentTransitions::TRANSITION_REFUND);
+                }
 
-            $this->logger->info("Refunded order #{$operationResponse['orderDetails']['orderId']} has been saved.");
+                $this->paymentEntityManager->flush();
+                $this->requestStack->getSession()->getFlashBag()->add('success', 'sylius.payment.refunded');
+
+                $this->logger->info("Refunded order #{$operationResponse['orderDetails']['orderId']} has been saved.");
+            }
         }
     }
 

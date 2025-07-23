@@ -22,11 +22,6 @@
                  parent="sylius.repository.order">
         </service>
 
-        <service id="app.sylius_payment" class="Payum\Core\Bridge\Symfony\Builder\GatewayFactoryBuilder">
-            <argument>Lyranetwork\Lyra\Payum\SyliusPaymentGatewayFactory</argument>
-            <tag name="payum.gateway_factory_builder" factory="lyra_sylius_payment" />
-        </service>
-
         <service id="Lyranetwork\Lyra\Form\Type\SyliusGatewayConfigurationType">
             <argument type="service" id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface" />
             <argument type="service" id="router" />
@@ -45,6 +40,14 @@
 
         <service id="Lyranetwork\Lyra\Service\OrderService">
             <argument type="service" id="Lyranetwork\Lyra\Repository\OrderRepositoryInterface" />
+            <argument type="service" id="Sylius\Bundle\CoreBundle\Mailer\OrderEmailManagerInterface" />
+            <argument type="service" id="logger" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Service\RefundService">
+            <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
+            <argument type="service" id="Lyranetwork\Lyra\Sdk\RefundProcessor" />
         </service>
 
         <service id="Lyranetwork\Lyra\Sdk\RestData">
@@ -52,15 +55,16 @@
             <argument type="service" id="logger" />
             <argument type="service" id="router" />
             <argument type="service" id="sylius.repository.customer" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="Lyranetwork\Lyra\Sdk\RefundProcessor" public="true">
             <argument type="service" id="logger" />
             <argument type="service" id="translator" />
             <argument type="service" id="request_stack" />
-            <argument type="service" id="sylius.repository.payment" />
+            <argument type="service" id="Lyranetwork\Lyra\Repository\OrderRepositoryInterface" />
             <argument type="service" id="sylius.manager.payment" />
-            <argument key="$stateMachineFactory" type="service" id="sm.factory" />
+            <argument type="service" id="sylius_abstraction.state_machine"/>
         </service>
 
         <service id="sylius_lyra_plugin.twig.extension.smartform_provider" class="Lyranetwork\Lyra\Twig\Extensions\SmartformProvider">
@@ -68,9 +72,8 @@
             <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
             <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
             <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
-            <argument type="service" id="sylius.context.currency" />
+            <argument type="service" id="sylius_abstraction.state_machine"/>
             <argument type="service" id="sylius.context.locale" />
-            <argument key="$stateMachineFactory" type="service" id="sm.factory" />
             <tag name="twig.extension" />
         </service>
 
@@ -79,6 +82,13 @@
             <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
             <argument type="service" id="sylius.context.channel" />
             <tag name="kernel.event_listener" event="sylius.menu.shop.account" method="addAccountMenuItems" />
+        </service>
+
+
+        <service id="sylius_lyra_plugin.event_listener.order_workflow" class="Lyranetwork\Lyra\EventListener\OrderWorkflowListener">
+            <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
+
+            <tag name="kernel.event_listener" event="workflow.sylius_payment.completed.complete" priority="-100" />
         </service>
 
         <service id="Lyranetwork\Lyra\Controller\CardController" public="true">
@@ -98,12 +108,10 @@
             <argument type="service" id="sylius.repository.payment" />
             <argument type="service" id="logger" />
             <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
-            <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
+            <argument type="service" id="Lyranetwork\Lyra\Service\RefundService" />
             <argument type="service" id="sylius.manager.payment" />
             <argument type="service" id="request_stack" />
-            <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
-            <argument type="service" id="Lyranetwork\Lyra\Sdk\RefundProcessor" />
-            <argument key="$stateMachineFactory" type="service" id="sm.factory" />
+            <argument type="service" id="sylius_abstraction.state_machine"/>
         </service>
 
         <service id="Lyranetwork\Lyra\Controller\OrderController" public="true" parent="sylius.controller.order">
@@ -112,9 +120,10 @@
             <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
             <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
             <argument type="service" id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface" />
-            <argument type="service" id="Sylius\Calendar\Provider\DateTimeProviderInterface" />
             <argument type="service" id="translator" />
-            <argument key="$stateMachineFactory" type="service" id="sm.factory" />
+            <argument type="service" id="sylius.context.locale" />
+            <argument type="service" id="router" />
+            <argument type="service" id="sylius_abstraction.state_machine"/>
         </service>
     </services>
 </container>

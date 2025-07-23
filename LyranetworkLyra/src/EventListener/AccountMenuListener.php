@@ -48,7 +48,7 @@ final class AccountMenuListener
 
     public function addAccountMenuItems(MenuBuilderEvent $event): void
     {
-        $gatewayName = constant('Lyranetwork\Lyra\Payum\SyliusPaymentGatewayFactory::FACTORY_NAME');
+        $gatewayName = constant('Lyranetwork\\Lyra\\Sdk\\Tools::FACTORY_NAME');
         $lyraPaymentMethods = $this->paymentMethodRepository->findAllByGatewayName($gatewayName);
 
         if (is_array($lyraPaymentMethods) && ! empty($lyraPaymentMethods)) {
@@ -62,7 +62,7 @@ final class AccountMenuListener
                     $menu->addChild('card', ['route' => 'lyra_sylius_account_saved_cards'])
                         ->setAttribute('type', 'link')
                         ->setLabel('sylius_lyra_plugin.ui.account.saved_cards.title')
-                        ->setLabelAttribute('icon', 'credit card');
+                        ->setLabelAttribute('icon', 'tabler:credit-card');
 
                     break;
                 }

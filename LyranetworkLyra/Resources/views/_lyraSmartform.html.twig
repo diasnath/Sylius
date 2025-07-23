@@ -18,8 +18,10 @@
 
 {% if order is defined %}
     {% set formToken, returnUrl, popin, dataEntryMode, logoHeader = lyra_get_smartform_token(order, methodCode).formToken, path('lyra_return_url'), '', '', '' %}
+    {% set single = 'kr-single-payment-button' %}
     {% if lyraFormConfig.popinMode %}
         {% set popin = 'kr-popin' %}
+        {% set single = '' %}
     {% endif %}
 
     {% if lyraFormConfig.cardDataEntryMode is same as('MODE_SMARTFORM_EXT_WITH_LOGOS') or lyraFormConfig.cardDataEntryMode is same as('MODE_SMARTFORM_EXT_WITHOUT_LOGOS') %}
@@ -30,7 +32,7 @@
         {% set logoHeader = 'kr-no-card-logo-header ' %}
     {% endif %}
 {% elseif accountToken is not empty %}
-    {% set formToken, returnUrl, popin, dataEntryMode, logoHeader = accountToken, path('lyra_sylius_account_saved_cards'), '', 'kr-card-form-expanded', '' %}
+    {% set formToken, returnUrl, popin, dataEntryMode, logoHeader, single = accountToken, path('lyra_sylius_account_saved_cards'), '', 'kr-card-form-expanded', '', '' %}
 {% endif %}
 
 <div id="lyraPaymentMethodForm">
@@ -43,99 +45,91 @@
     <link rel="stylesheet" href="{{ lyraFormConfig.jsClient }}js/krypton-client/V4.0/ext/{{ lyraFormConfig.theme }}-reset.css">
     <script src="{{ lyraFormConfig.jsClient }}js/krypton-client/V4.0/ext/{{ lyraFormConfig.theme }}.js"></script>
 
-    <div class="kr-smart-form" {{ popin }} {{ dataEntryMode }} {{ logoHeader }} kr-form-token="{{formToken}}" style="z-index: 3; width: 100%;"></div>
+    <div class="kr-smart-form" {{ single }} {{ popin }} {{ dataEntryMode }} {{ logoHeader }} kr-form-token="{{formToken}}" style="z-index: 3; width: 100%;"></div>
     {% if order is defined %}
         <script>
+            let redirectOnClose = "";
             function init() {
-                const lyraCheckBox = $(".lyraPaymentCheckBox input[type='radio']");
-                const nextStepButton = $('form[name="sylius_checkout_select_payment"] button[type="submit"]');
+                const lyraCheckBox = $("input[type='radio'][value='{{ methodCode }}']");
                 if (lyraCheckBox) {
                     configureSmartform();
                     togglePaymentMethodTitle();
-                    if (lyraCheckBox.is(":checked")) {
-                        nextStepButton.prop('disabled', true);
-                    }
                 }
             }
 
             function togglePaymentMethodTitle() {
                 const popin = '{{lyraFormConfig.popinMode}}' === '1';
-                const nbMethod = $(".payment-item .checkbox input[type='radio']").length;
-                const lyraCheckBox = $(".lyraPaymentCheckBox input[type='radio']");
-                if (popin || nbMethod > 1) {
+                const nbMethod = $("input[type='radio']").length;
+                const lyraCheckBox = $("input[type='radio'][value='{{ methodCode }}']");
+                if (! popin && nbMethod == 1) {
                     $(".lyraPaymentChoiceTitle").each(function () {
-                        this.style.setProperty('display', 'flex', 'important')
+                        this.style.setProperty('display', 'none', 'important')
                     });
                 }
 
                 lyraCheckBox.prop("checked", true);
             }
 
+            function toggleSubmitButton(enabled) {
+                const submitButton = $("form[name='sylius_checkout_select_payment'] button[type='submit']");
+                submitButton.prop('disabled', !enabled);
+            }
+
             async function handleButtonsDisplay() {
-                $(".payment-item .checkbox input[type='radio']").on('change', handleButtonsDisplay);
-                $('input[id*="sylius_checkout_select_payment_tos\"]').on('change', handleButtonsDisplay);
-                const popin = '{{lyraFormConfig.popinMode}}' === '1';
-                const lyraCheckBox = $(".lyraPaymentCheckBox input[type='radio']");
-                const nextStepButton = $('form[name="sylius_checkout_select_payment"] button[type="submit"]');
-                let showNext = true;
+                const lyraCheckBox = $("input[type='radio'][value='{{ methodCode }}']");
                 const smartform = $('#lyraPaymentMethodForm');
-
-                nextStepButton.prop('disabled', false);
-
-                if (! popin) {
-                    $(".kr-payment-button").each(function() {
-                        this.style.setProperty('display', 'flex', 'important')
-                    });
-                    showNext = false;
-
-                    const methods = await KR.getPaymentMethods().then(function(result) {
-                        return result;
-                    });
-
-                    // If only the card form is available, hide our payment button and use Sylius button.
-                    if ((methods.paymentMethods.length == 1) && (methods.paymentMethods[0] == 'CARDS')) {
-                        $(".kr-methods-list-card-form-wrapper .kr-card-form .kr-payment-button").hide();
-                        showNext = true;
-                    }
-                }
-
-                if (showNext) {
-                    nextStepButton.show();
-                    nextStepButton.on('click', openSmartform);
-                } else {
-                    nextStepButton.hide();
-                }
 
                 if (lyraCheckBox.is(":checked")) {
                     smartform.show();
                 } else {
-                    nextStepButton.show();
                     smartform.hide();
-                }
-
-                if (lyraCanProceed()) {
-                    nextStepButton.prop("disabled", false)
-                } else {
-                    nextStepButton.prop("disabled", true)
+                    if (redirectOnClose !== "") {
+                        document.location.href = redirectOnClose;
+                    }
                 }
             }
 
             function openSmartform(event) {
                 const popin = '{{lyraFormConfig.popinMode}}' === '1';
-                const paymentForm = $('form[name="sylius_checkout_select_payment"]');
-                const lyraCheckBox = $(".lyraPaymentCheckBox input[type='radio']");
+                let paymentForm = $('form[name="sylius_shop_checkout_select_payment"]');
+                if (paymentForm.length < 1) {
+                    paymentForm = $('form[name="sylius_checkout_select_payment"]');
+                }
+                const lyraCheckBox = $("input[type='radio'][value='{{ methodCode }}']");
                 if (lyraCheckBox.is(":checked")) {
                     event.preventDefault();
+                    toggleSubmitButton(false);
                     paymentForm.removeClass('loading');
-                    if (popin) {
-                        KR.openPopin();
-                    } else {
-                        KR.submit();
-                    }
+
+                    // Refresh form token.
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ path("lyra_rest_form_token") }}',
+                        data: { 'orderIdDB': '{{ order.id }}', "instanceCode": '{{ methodCode }}' },
+                        success: function(data) {
+                            redirectOnClose = data.redirectOnClose;
+
+                            KR.setFormConfig({
+                                formToken: data.formToken
+                            }).then(function(v) {
+                                KR = v.KR;
+                                if (popin) {
+                                    KR.openPopin();
+                                } else {
+                                    KR.openSelectedPaymentMethod();
+                                }
+                            })
+                        }
+                    });
                 }
             }
 
             function configureSmartform() {
+                let paymentForm = $('form[name="sylius_shop_checkout_select_payment"]');
+                if (paymentForm.length < 1) {
+                    paymentForm = $('form[name="sylius_checkout_select_payment"]');
+                }
+
                 if ('{{lyraFormConfig.compactMode}}') {
                     KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
                 }
@@ -145,173 +139,17 @@
                     form: { smartform: { singlePaymentButton: { visibility: false }}}
                 });
 
-                KR.smartForm.onClick(function({ paymentMethod, action, formId }) {
-                    return lyraCheckTermsAndConditions(paymentMethod);
-                })
-
-                KR.onPopinClosed(function() {
-                    if (lyraCanProceed()) {
-                        $('form[name="sylius_checkout_select_payment"] button[type="submit"]').prop('disabled', false);
-                    }
+                KR.onError(function() {
+                    toggleSubmitButton(true);
                 });
 
+                KR.onPopinClosed(function() {
+                    toggleSubmitButton(true)
+                });
+
+                paymentForm.on('submit', openSmartform);
+                $("input[type='radio']").on('change', handleButtonsDisplay);
                 KR.onFormReady(handleButtonsDisplay);
-            }
-
-            function lyraCheckTermsAndConditions(paymentMethod) {
-                if (! lyraCanProceed()) {
-                    KR.throwCustomError(lyraTranslate("CLIENT_312"), paymentMethod);
-
-                    return false;
-                }
-
-                return true;
-            }
-
-            function lyraCanProceed() {
-                let approvedConditions = ($('input[id*="sylius_checkout_select_payment_tos\"]:checked').length == $('input[id*="sylius_checkout_select_payment_tos\"]').length);
-
-                return ! (! approvedConditions || $('form[name="sylius_checkout_select_payment"] button[type="submit"]').prop('disabled'));
-            }
-
-            const LYRA_ERROR_MESSAGES = {
-                fr: {
-                    RELOAD_LINK: 'Veuillez rafraîchir la page.',
-                    CLIENT_001: 'Le paiement est refusé. Essayez de payer avec une autre carte.',
-                    CLIENT_101: 'Le paiement est annulé.',
-                    CLIENT_301: 'Le numéro de carte est invalide. Vérifiez le numéro et essayez à nouveau.',
-                    CLIENT_302: 'La date d\'expiration est invalide. Vérifiez la date et essayez à nouveau.',
-                    CLIENT_303: 'Le code de sécurité CVV est invalide. Vérifiez le code et essayez à nouveau.',
-                    CLIENT_312: 'Veuillez vous assurer que vous avez accepté les conditions générales de vente.',
-                    CLIENT_999: 'Une erreur technique est survenue. Merci de réessayer plus tard.',
-
-                    INT_999: 'Une erreur technique est survenue. Merci de réessayer plus tard.',
-
-                    PSP_003: 'Le paiement est refusé. Essayez de payer avec une autre carte.',
-                    PSP_099: 'Trop de tentatives ont été effectuées. Merci de réessayer plus tard.',
-                    PSP_108: 'Le formulaire a expiré.',
-                    PSP_999: 'Une erreur est survenue durant le processus de paiement.',
-
-                    ACQ_001: 'Le paiement est refusé. Essayez de payer avec une autre carte.',
-                    ACQ_999: 'Une erreur est survenue durant le processus de paiement.'
-                },
-
-                en: {
-                    RELOAD_LINK: 'Please refresh the page.',
-                    CLIENT_001: 'Payment is refused. Try to pay with another card.',
-                    CLIENT_101: 'Payment is cancelled.',
-                    CLIENT_301: 'The card number is invalid. Please check the number and try again.',
-                    CLIENT_302: 'The expiration date is invalid. Please check the date and try again.',
-                    CLIENT_303: 'The card security code (CVV) is invalid. Please check the code and try again.',
-                    CLIENT_312: 'Please make sure you have accepted the terms and conditions.',
-                    CLIENT_999: 'A technical error has occurred. Please try again later.',
-
-                    INT_999: 'A technical error has occurred. Please try again later.',
-
-                    PSP_003: 'Payment is refused. Try to pay with another card.',
-                    PSP_099: 'Too many attempts. Please try again later.',
-                    PSP_108: 'The form has expired.',
-                    PSP_999: 'An error has occurred during the payment process.',
-
-                    ACQ_001: 'Payment is refused. Try to pay with another card.',
-                    ACQ_999: 'An error has occurred during the payment process.'
-                },
-
-                de: {
-                    RELOAD_LINK: 'Bitte aktualisieren Sie die Seite.',
-                    CLIENT_001: 'Die Zahlung wird abgelehnt. Versuchen Sie, mit einer anderen Karte zu bezahlen.',
-                    CLIENT_101: 'Die Zahlung wird storniert.',
-                    CLIENT_301: 'Die Kartennummer ist ungültig. Bitte überprüfen Sie die Nummer und versuchen Sie es erneut.',
-                    CLIENT_302: 'Das Verfallsdatum ist ungültig. Bitte überprüfen Sie das Datum und versuchen Sie es erneut.',
-                    CLIENT_303: 'Der Kartenprüfnummer (CVC) ist ungültig. Bitte überprüfen Sie den Nummer und versuchen Sie es erneut.',
-                    CLIENT_312: 'Bitte akzeptieren Sie unsere Allgemeinen Geschäftsbedingungen.',
-                    CLIENT_999: 'Ein technischer Fehler ist aufgetreten. Bitte Versuchen Sie es später erneut.',
-
-                    INT_999: 'Ein technischer Fehler ist aufgetreten. Bitte Versuchen Sie es später erneut.',
-
-                    PSP_003: 'Die Zahlung wird abgelehnt. Versuchen Sie, mit einer anderen Karte zu bezahlen.',
-                    PSP_099: 'Zu viele Versuche. Bitte Versuchen Sie es später erneut.',
-                    PSP_108: 'Das Formular ist abgelaufen.',
-                    PSP_999: 'Ein Fehler ist während dem Zahlungsvorgang unterlaufen.',
-
-                    ACQ_001: 'Die Zahlung wird abgelehnt. Versuchen Sie, mit einer anderen Karte zu bezahlen.',
-                    ACQ_999: 'Ein Fehler ist während dem Zahlungsvorgang unterlaufen.'
-                },
-
-                es: {
-                    RELOAD_LINK: 'Por favor, actualice la página.',
-                    CLIENT_001: 'El pago es rechazado. Intenta pagar con otra tarjeta.',
-                    CLIENT_101: 'Se cancela el pago.',
-                    CLIENT_301: 'El número de tarjeta no es válido. Por favor, compruebe el número y vuelva a intentarlo.',
-                    CLIENT_302: 'La fecha de caducidad no es válida. Por favor, compruebe la fecha y vuelva a intentarlo.',
-                    CLIENT_303: 'El código de seguridad de la tarjeta (CVV) no es válido. Por favor revise el código y vuelva a intentarlo.',
-                    CLIENT_312: 'Es necesario aceptar los términos y condiciones al final de la página para poder proceder con el pago.',
-                    CLIENT_999: 'Ha ocurrido un error técnico. Por favor, inténtelo de nuevo más tarde.',
-
-                    INT_999: 'Ha ocurrido un error técnico. Por favor, inténtelo de nuevo más tarde.',
-
-                    PSP_003: 'El pago es rechazado. Intenta pagar con otra tarjeta.',
-                    PSP_099: 'Demasiados intentos. Por favor, inténtelo de nuevo más tarde.',
-                    PSP_108: 'El formulario ha expirado.',
-                    PSP_999: 'Ocurrió un error en el proceso de pago.',
-
-                    ACQ_001: 'El pago es rechazado. Intenta pagar con otra tarjeta.',
-                    ACQ_999: 'Ocurrió un error en el proceso de pago.'
-                },
-
-                br: {
-                    RELOAD_LINK: 'Por favor, atualize a página.',
-                    CLIENT_001: 'O pagamento é rejeitado. Tente pagar com outro cartão.',
-                    CLIENT_101: 'O pagamento é cancelado.',
-                    CLIENT_301: 'O número do cartão é inválido. Por favor, cheque o número e tente novamente.',
-                    CLIENT_302: 'A data de expiração é inválida. Verifique a data e tente novamente.',
-                    CLIENT_303: 'O código de segurança do cartão (CVV) é inválido. Verifique o código e tente novamente.',
-                    CLIENT_312: 'Certifique-se que aceitou os termos e as condições.',
-                    CLIENT_999: 'Ocorreu um erro técnico. Por favor, tente novamente mais tarde.',
-
-                    INT_999: 'Ocorreu um erro técnico. Por favor, tente novamente mais tarde.',
-
-                    PSP_003: 'O pagamento é rejeitado. Tente pagar com outro cartão.',
-                    PSP_099: 'Muitas tentativas. Por favor, tente novamente mais tarde.',
-                    PSP_108: 'O formulário expirou.',
-                    PSP_999: 'Ocorreu um erro no processo de pagamento.',
-
-                    ACQ_001: 'O pagamento é rejeitado. Tente pagar com outro cartão.',
-                    ACQ_999: 'Ocorreu um erro no processo de pagamento.'
-                },
-
-                pt: {
-                    RELOAD_LINK: 'Por favor, atualize a página.',
-                    CLIENT_001: 'O pagamento é rejeitado. Tente pagar com outro cartão.',
-                    CLIENT_101: 'O pagamento é cancelado.',
-                    CLIENT_301: 'O número do cartão é inválido. Por favor, cheque o número e tente novamente.',
-                    CLIENT_302: 'A data de expiração é inválida. Verifique a data e tente novamente.',
-                    CLIENT_303: 'O código de segurança do cartão (CVV) é inválido. Verifique o código e tente novamente.',
-                    CLIENT_312: 'Certifique-se que aceitou os termos e as condições.',
-                    CLIENT_999: 'Ocorreu um erro técnico. Por favor, tente novamente mais tarde.',
-
-                    INT_999: 'Ocorreu um erro técnico. Por favor, tente novamente mais tarde.',
-
-                    PSP_003: 'O pagamento é rejeitado. Tente pagar com outro cartão.',
-                    PSP_099: 'Muitas tentativas. Por favor, tente novamente mais tarde.',
-                    PSP_108: 'O formulário expirou.',
-                    PSP_999: 'Ocorreu um erro no processo de pagamento.',
-
-                    ACQ_001: 'O pagamento é rejeitado. Tente pagar com outro cartão.',
-                    ACQ_999: 'Ocorreu um erro no processo de pagamento.'
-                }
-            };
-
-            function lyraTranslate(code) {
-                const lang = '{{ lyraFormConfig.language }}'; // Global variable that contains current language.
-                const messages = LYRA_ERROR_MESSAGES.hasOwnProperty(lang) ? LYRA_ERROR_MESSAGES[lang] : LYRA_ERROR_MESSAGES['en'];
-
-                if (! messages.hasOwnProperty(code)) {
-                    const index = code.lastIndexOf('_');
-                    code = code.substring(0, index + 1) + '999';
-                }
-
-                return messages[code];
             }
 
             document.addEventListener("DOMContentLoaded", init, false);

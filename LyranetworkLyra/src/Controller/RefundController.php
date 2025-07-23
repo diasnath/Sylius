@@ -12,12 +12,11 @@ declare(strict_types=1);
 namespace Lyranetwork\Lyra\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Lyranetwork\Lyra\Sdk\Tools as LyraTools;
-use Lyranetwork\Lyra\Service\ConfigService;
+use Lyranetwork\Lyra\Service\RefundService;
 use Sylius\Component\Core\Repository\PaymentRepositoryInterface;
 use Sylius\Component\Payment\PaymentTransitions;
 use Sylius\Component\Core\Model\PaymentInterface;
-use SM\Factory\FactoryInterface;
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,12 +24,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use Lyranetwork\Lyra\Sdk\RefundProcessor as LyraRefundProcessor;
-use Lyranetwork\Lyra\Sdk\RestData;
 use Lyranetwork\Lyra\Sdk\Refund\OrderInfo as LyraOrderInfo;
-use Lyranetwork\Lyra\Sdk\Refund\Api as LyraRefund;
 use Lyranetwork\Lyra\Sdk\Form\Api as LyraApi;
-use Lyranetwork\Lyra\Form\Type\SyliusGatewayConfigurationType as GatewayConfiguration;
 
 use Psr\Log\LoggerInterface;
 
@@ -64,46 +59,32 @@ final class RefundController
     private $requestStack;
 
     /**
-     * @var RestData
+     * @var StateMachineInterface
      */
-    private $restData;
+    private $stateMachine;
 
     /**
-     * @var ConfigService
+     * @var RefundService
      */
-    private $configService;
-
-    /**
-     * @var LyraRefundProcessor
-     */
-    private $refundProcessor;
-
-    /**
-     * @var FactoryInterface
-     */
-    private $stateMachineFactory;
+    private $refundService;
 
     public function __construct(
         PaymentRepositoryInterface $paymentRepository,
         LoggerInterface $logger,
         OrderService $orderService,
-        ConfigService $configService,
+        RefundService $refundService,
         EntityManagerInterface $paymentEntityManager,
         RequestStack $requestStack,
-        RestData $restData,
-        LyraRefundProcessor $refundProcessor,
-        FactoryInterface $stateMachineFactory
+        StateMachineInterface $stateMachine
     )
     {
         $this->paymentRepository = $paymentRepository;
         $this->logger = $logger;
         $this->orderService = $orderService;
-        $this->configService = $configService;
+        $this->refundService = $refundService;
         $this->paymentEntityManager = $paymentEntityManager;
         $this->requestStack = $requestStack;
-        $this->restData = $restData;
-        $this->refundProcessor = $refundProcessor;
-        $this->stateMachineFactory = $stateMachineFactory;
+        $this->stateMachine = $stateMachine;
     }
 
     public function paymentRefundOrCancelAction(Request $request)
@@ -121,7 +102,7 @@ final class RefundController
         $gatewayConfig = $paymentMethod->getGatewayConfig();
         $factoryName = $gatewayConfig->getFactoryName() ?? null;
 
-        if ($factoryName !== constant('Lyranetwork\Lyra\Payum\SyliusPaymentGatewayFactory::FACTORY_NAME')) {
+        if ($factoryName !== constant('Lyranetwork\Lyra\Sdk\Tools::FACTORY_NAME')) {
             $this->applyStateMachineTransition($payment);
 
             $this->requestStack->getSession()->getFlashBag()->add('success', 'sylius.payment.refunded');
@@ -133,42 +114,23 @@ final class RefundController
         $orderId = $request->get('orderId');
         $order = $this->orderService->get($orderId);
 
-        $lyraOrderInfo = new LyraOrderInfo();
-        $lyraOrderInfo->setOrderRemoteId($order->getNumber());
-        $lyraOrderInfo->setOrderId($order->getNumber());
-        $lyraOrderInfo->setOrderReference($order->getNumber());
-        $lyraOrderInfo->setOrderCurrencyIsoCode($order->getCurrencyCode());
-        $lyraOrderInfo->setOrderCurrencySign($order->getCurrencyCode());
-        $lyraOrderInfo->setOrderUserInfo($this->getUserInfo());
-
         $paymentMethodCode = $paymentMethod->getCode();
 
-        $refundApi = new LyraRefund(
-            $this->refundProcessor->getProcessor(),
-            $this->restData->getPrivateKey($paymentMethodCode),
-            LyraTools::getDefault('REST_URL'),
-            $this->configService->get(GatewayConfiguration::$REST_FIELDS . 'site_id', $paymentMethodCode),
-            'Sylius'
-        );
+        $currency = LyraApi::findCurrencyByAlphaCode($payment->getCurrencyCode());
+        $amount = $currency->convertAmountToFloat($payment->getAmount());
 
-        $amount = $order->getTotal();
-        $currency = LyraApi::findCurrencyByAlphaCode($order->getCurrencyCode());
-        $amount = $currency->convertAmountToFloat($amount);
-
-        $refundApi->refund($lyraOrderInfo, $amount);
+        $this->refundService->refund($paymentMethodCode, $order, $this->getUserInfo(), $amount);
 
         return $this->redirectToReferer($request);
     }
 
     private function applyStateMachineTransition(PaymentInterface $payment): void
     {
-        $stateMachine = $this->stateMachineFactory->get($payment, PaymentTransitions::GRAPH);
-
-        if (! $stateMachine->can(PaymentTransitions::TRANSITION_REFUND)) {
+        if (! $this->stateMachine->can($payment, PaymentTransitions::GRAPH, PaymentTransitions::TRANSITION_REFUND)) {
             throw new BadRequestHttpException();
         }
 
-        $stateMachine->apply(PaymentTransitions::TRANSITION_REFUND);
+        $this->stateMachine->apply($payment, PaymentTransitions::GRAPH, PaymentTransitions::TRANSITION_REFUND);
         $this->paymentEntityManager->flush();
     }
 

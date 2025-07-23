@@ -8,35 +8,80 @@ Lyra Collect for Sylius is an open source plugin that links e-commerce websites 
 - Require the plugin with composer using the following command:
 
 ```
-composer require lyranetwork\sylius-lyranetwork-plugin dev-lyra
+composer require lyranetwork/sylius-lyranetwork-plugin dev-lyra
 ```
-### With module zip file
-- Unzip module in your Sylius root folder.
-- Add in file `sylius/composer.json`, in autoload psr-4 the line:
-
-```
-"Lyranetwork\\Lyra\\": "LyranetworkLyra/src/"
-```
-
-### Add module to bundles
-- Add the following line in  __bundles.php__  file located in `sylius/config/`:
+- Add the following line in  __bundles.php__  file located in `[sylius-root]/config/`:
 
 ```
 Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
 ```
 
-- Add Lyra routes in `config/routes.yaml`
+- Add Lyra routes in  __routes.yaml__  file located in `[sylius-root]/config/`:
 
  ```yaml
  sylius_lyra:
     resource: "@LyranetworkLyraPlugin/Resources/config/routing.yaml"
  ```
 
-- Open command line in Sylius root directory, and run the following commands to extract the translations for the plugin:
+- Add Lyra config in ___sylius.yaml__  file located in `[sylius-root]/config/packages` :
+
+```
+imports:
+[...]
+    - { resource: "@LyranetworkLyraPlugin/Resources/config/config.yaml" }
+```
+
+- Dump the autoload cache using the following command:
 
 ```
 composer dump-autoload
+```
 
+- Empty the cache with the following command:
+
+```
+php bin/console cache:clear
+```
+
+The plugin should be now available in the list of payment methods that you can create.
+
+### With plugin zip file
+- Unzip module in your Sylius root folder.
+- Add in file `[sylius-root]/composer.json`, in autoload psr-4 the following line:
+
+```
+"Lyranetwork\\Lyra\\": "LyranetworkLyra/src/"
+```
+- Add the following line in  __bundles.php__  file located in `[sylius-root]/config/`:
+
+```
+Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
+```
+
+- Add Lyra routes in  __routes.yaml__  file located in `[sylius-root]/config/`:
+
+ ```yaml
+ sylius_lyra:
+    resource: "@LyranetworkLyraPlugin/Resources/config/routing.yaml"
+ ```
+
+- Add Lyra config in ___sylius.yaml__  file located in `[sylius-root]/config/packages` :
+
+```
+imports:
+[...]
+    - { resource: "@LyranetworkLyraPlugin/Resources/config/config.yaml" }
+```
+
+- Dump the autoload cache using the following command:
+
+```
+composer dump-autoload
+```
+
+- Open command line in Sylius root directory, and run the following commands to extract the translations for the plugin:
+
+```
 php bin/console translation:extract en LyranetworkLyraPlugin --dump-messages
 php bin/console translation:extract fr LyranetworkLyraPlugin --dump-messages
 php bin/console translation:extract es LyranetworkLyraPlugin --dump-messages
@@ -44,37 +89,19 @@ php bin/console translation:extract de LyranetworkLyraPlugin --dump-messages
 php bin/console translation:extract pt LyranetworkLyraPlugin --dump-messages
 php bin/console translation:extract br LyranetworkLyraPlugin --dump-messages
 ```
-**Careful**
 
-- Add the overrode templates. If you have already overrode one of the following files, you need to merge it with ours. You will find them in LyranetworkLyra/Resources/views/bundles/ directories.
-
-```
-SyliusAdminBundle\PaymentMethod\_form.html.twig
-SyliusAdminBundle\OrderShow\_payment.html.twig
-SyliusShopBundle\Checkout\SelectPayment\_choice.html.twig
-SyliusUiBundle\Form\theme.html.twig
-```
-- If not, just copy them with the following command, if you used the zip method to install:
-
-```
-cp -R LyranetworkLyra/Resources/views/bundles/* templates/bundles/
-```
-- Or this one if you used composer :
-
-```
-cp -R vendor/lyranetwork/sylius-lyranetwork-plugin/LyranetworkLyra/Resources/views/bundles/* templates/bundles/
-```
 - Empty the cache with the following command:
 
 ```
 php bin/console cache:clear
 ```
+
 The plugin should be now available in the list of payment methods that you can create.
 
 ## Configuration
 In the Sylius administration interface:
 - Go to `Configuration > Payment methods`.
-- Click on `Create` button on the right top of the page to display the list of available payment methods.
+- Click on `Create` button on the top right of the page to display the list of available payment methods.
 - Choose `Payment by Lyra Collect` to add and configure it.
 - You can now enter your Lyra Collect credentials and configure your payment method. 
 - Don't forget to give your payment method a code, to set the name in the language sections at the bottom and to save by clicking the `Create` button.
@@ -95,26 +122,25 @@ composer remove lyranetwork/sylius-lyranetwork-plugin
 ```
 
 ### Remove and revert changes
-- Remove the following line in  __bundles.php__  file located in `sylius/config/`:
+- Remove the following line in  __bundles.php__  file located in `[sylius-root]/config/`:
 
 ```
 Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
 ```
 
-- Remove Lyra routes in `config/routes.yaml`
+- Remove Lyra routes in  __routes.yaml__  file located in `[sylius-root]/config/`
 
 ```yaml
  sylius_lyra:
     resource: "@LyranetworkLyraPlugin/Resources/config/routing.yaml"
 ```
 
-- Remove or unmerge all added template files in `templates/bundles/`
+- Remove Lyra config in ___sylius.yaml__  file located in `[sylius-root]/config/packages` :
 
 ```
-SyliusAdminBundle\PaymentMethod\_form.html.twig
-SyliusAdminBundle\OrderShow\_payment.html.twig
-SyliusShopBundle\Checkout\SelectPayment\_choice.html.twig
-SyliusUiBundle\Form\theme.html.twig
+imports:
+[...]
+    - { resource: "@LyranetworkLyraPlugin/Resources/config/config.yaml" }
 ```
 
 - Open command line in Sylius root directory, and run the following commands:

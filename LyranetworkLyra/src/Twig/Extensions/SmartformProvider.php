@@ -21,8 +21,7 @@ use Lyranetwork\Lyra\Service\OrderService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-use SM\Factory\FactoryInterface;
-
+use Sylius\Abstraction\StateMachine\StateMachineInterface;
 use Sylius\Component\Order\OrderTransitions;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 
@@ -51,9 +50,9 @@ class SmartformProvider extends AbstractExtension
     private $orderService;
 
     /**
-     * @var FactoryInterface
+     * @var StateMachineInterface
      */
-    private $stateMachineFactory;
+    private $stateMachine;
 
     /**
      * @var LocaleContextInterface
@@ -65,7 +64,7 @@ class SmartformProvider extends AbstractExtension
         ConfigService $configService,
         RestData $restData,
         OrderService $orderService,
-        FactoryInterface $stateMachineFactory,
+        StateMachineInterface $stateMachine,
         LocaleContextInterface $localeContext
     )
     {
@@ -73,7 +72,7 @@ class SmartformProvider extends AbstractExtension
         $this->configService = $configService;
         $this->restData = $restData;
         $this->orderService = $orderService;
-        $this->stateMachineFactory = $stateMachineFactory;
+        $this->stateMachine = $stateMachine;
         $this->localeContext = $localeContext;
     }
 
@@ -87,9 +86,10 @@ class SmartformProvider extends AbstractExtension
 
     public function getSmartformToken($order, $instanceCode): array
     {
-        $orderStateMachine = $this->stateMachineFactory->get($order, OrderTransitions::GRAPH);
-        if ($orderStateMachine->can('create')) {
-            $orderStateMachine->apply('create');
+        $this->logger->info("Start retrieving smartform token for payment page.");
+
+        if ($this->stateMachine->can($order, OrderTransitions::GRAPH, OrderTransitions::TRANSITION_CREATE)) {
+            $this->stateMachine->apply($order, OrderTransitions::GRAPH, OrderTransitions::TRANSITION_CREATE);
         }
 
         $order = $this->orderService->get(strval($order->getId()));

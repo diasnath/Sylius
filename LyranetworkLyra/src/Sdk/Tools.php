@@ -15,6 +15,8 @@ use Lyranetwork\Lyra\Sdk\Form\Api as LyraApi;
 
 class Tools
 {
+    public const FACTORY_NAME = "lyra_sylius_payment";
+
     private static $GATEWAY_CODE = 'Lyra';
     private static $GATEWAY_NAME = 'Lyra Collect';
     private static $BACKOFFICE_NAME = 'Lyra Expert';
@@ -26,9 +28,9 @@ class Tools
     private static $SIGN_ALGO = 'SHA-256';
     private static $LANGUAGE = 'en';
 
-    private static $CMS_IDENTIFIER = 'Sylius_1.12.x';
-    private static $SUPPORT_EMAIL = 'support-ecommerce@lyra-collect.com';
-    private static $PLUGIN_VERSION = '1.1.0-beta1';
+    private static $CMS_IDENTIFIER = 'Sylius_2.x';
+    private static $SUPPORT_EMAIL = 'https://support.lyra.com/hc/fr/requests/new';
+    private static $PLUGIN_VERSION = '2.0.0-beta1';
     private static $GATEWAY_VERSION = 'V2';
     private static $REST_URL = 'https://api.lyra.com/api-payment/';
     private static $STATIC_URL = 'https://static.lyra.com/static/';

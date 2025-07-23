@@ -103,12 +103,6 @@ final class SyliusGatewayConfigurationType extends AbstractType
             'label' => $this->PREFIX . 'ui.lyra_private_prod_key.label',
             'required' => false
         ])
-        ->add(self::$REST_FIELDS . 'rest_server_url', TextType::class, [
-            'label' => $this->PREFIX . 'ui.lyra_rest_server_url.label',
-            'data' => LyraTools::getDefault('REST_URL'),
-            'required' => false,
-            'disabled' => true
-        ])
         ->add(self::$REST_FIELDS . 'public_test_key', TextType::class, [
             'label' => $this->PREFIX . 'ui.lyra_public_test_key.label',
             'required' => false
@@ -125,12 +119,6 @@ final class SyliusGatewayConfigurationType extends AbstractType
             'label' => $this->PREFIX . 'ui.lyra_hmac_prod_key.label',
             'required' => false
         ])
-        ->add(self::$REST_FIELDS . 'js_client_url', TextType::class, [
-            'label' => $this->PREFIX . 'ui.lyra_js_client_url.label',
-            'data' => LyraTools::getDefault('STATIC_URL'),
-            'required' => false,
-            'disabled' => true
-        ])
         ->add(self::$ADVANCED_FIELDS . 'card_data_entry_mode', ChoiceType::class, [
             'label' => $this->PREFIX . 'ui.lyra_card_data_entry_mode.label',
             'choices' => [
@@ -139,7 +127,7 @@ final class SyliusGatewayConfigurationType extends AbstractType
                 $this->PREFIX . 'config.smartform.mode_smartform_ext_without_logos' => 'MODE_SMARTFORM_EXT_WITHOUT_LOGOS'
             ],
             'help' => $this->PREFIX . 'ui.lyra_card_data_entry_mode.helptext',
-            'data' => $config[self::$ADVANCED_FIELDS . 'card_data_entry_mode'] ?? 'MODE_SMARTFORM',
+            'data' => $config[self::$ADVANCED_FIELDS . 'card_data_entry_mode'] ?? 'MODE_SMARTFORM_EXT_WITH_LOGOS',
             'required' => false
         ])
         ->add(self::$ADVANCED_FIELDS . 'rest_popin_mode', CheckboxType::class, [
