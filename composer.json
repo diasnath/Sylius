@@ -1,8 +1,8 @@
 {
-	"name" : "nathand/sylius-lyranetwork-plugin-nathand",
+	"name" : "lyranetwork/sylius-lyranetwork-plugin",
 	"description" : "This plugin enables you to setup the Lyra Collect payment gateway on your Sylius website.",
 	"version" : "2.0.0-beta1",
-	"type" : "symfony-bundle",
+	"type" : "sylius-plugin",
 	"keywords" : [
 		"sylius",
 		"sylius-plugin"
@@ -16,7 +16,8 @@
 	"require" : {
 		"php" : "^8.0",
 		"sylius/sylius" : "^2.0",
-		"sylius/mailer-bundle" : "^1.8 || ^2.0@beta"
+		"sylius/mailer-bundle" : "^1.8 || ^2.0@beta",
+		"symfony/webpack-encore-bundle" : "^2.O"
 	},
 	"require-dev" : {
 		"behat/behat" : "^3.6.1",

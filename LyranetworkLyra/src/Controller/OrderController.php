@@ -385,8 +385,8 @@ final class OrderController extends BaseOrderController
                         $this->stateMachineInterface->apply($order, OrderPaymentTransitions::GRAPH, $newStatus['orderPaymentTransition']);
                     }
 
-                    if ($this->stateMachineInterface->can($order, OrderCheckoutTransitions::GRAPH, OrderCheckoutTransitions::GRANSITION_SELECT_SHIPPING)) {
-                        $this->stateMachineInterface->apply($order, OrderCheckoutTransitions::GRAPH, OrderCheckoutTransitions::GRANSITION_SELECT_SHIPPING);
+                    if ($this->stateMachineInterface->can($order, OrderCheckoutTransitions::GRAPH, OrderCheckoutTransitions::TRANSITION_SELECT_SHIPPING)) {
+                        $this->stateMachineInterface->apply($order, OrderCheckoutTransitions::GRAPH, OrderCheckoutTransitions::TRANSITION_SELECT_SHIPPING);
                     }
 
                     $lastPayment->setDetails($details);
