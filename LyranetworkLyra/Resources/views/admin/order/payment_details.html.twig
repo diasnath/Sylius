@@ -1,0 +1,30 @@
+{#
+* Copyright © Lyra Network.
+* This file is part of Lyra Collect plugin for Sylius. See COPYING.md for license details.
+*
+* @author    Lyra Network (https://www.lyra.com/)
+* @copyright Lyra Network
+* @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+#}
+
+{% set payment = hookable_metadata.context.payment %}
+{% set lyraGateway = constant('Lyranetwork\\Lyra\\Sdk\\Tools::FACTORY_NAME') %}
+
+<td class="py-2">
+    <strong {{ sylius_test_html_attribute('payment-method') }}>{{ payment.method.name }}</strong>
+    {% if payment.details['lyra_factory_name'] is defined and payment.details['lyra_factory_name'] is same as (lyraGateway) %}
+        <div id="lyraPaymentDetails">
+            <p>
+                {% if payment.details['lyra_trans_id'] is defined and payment.details['lyra_trans_id'] is not empty %}
+                    {{ 'sylius_lyra_plugin.ui.transaction_id'|trans }}{{payment.details['lyra_trans_id']}}<br>
+                {%endif%}
+                {% if payment.details['lyra_trans_uuid'] is defined and payment.details['lyra_trans_uuid'] is not empty %}
+                    {{ 'sylius_lyra_plugin.ui.transaction_uuid'|trans }}{{payment.details['lyra_trans_uuid']}}<br>
+                {%endif%}
+                {% if payment.details['lyra_card_brand'] is defined and payment.details['lyra_card_brand'] is not empty %}
+                    {{ 'sylius_lyra_plugin.ui.card_brand'|trans }}{{payment.details['lyra_card_brand']}}
+                {%endif%}
+            </p>
+        </div>
+    {% endif %}
+</td>

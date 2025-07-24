@@ -1,0 +1,20 @@
+{#
+ * Copyright © Lyra Network.
+ * This file is part of Lyra Collect plugin for Sylius. See COPYING.md for license details.
+ *
+ * @author    Lyra Network (https://www.lyra.com/)
+ * @copyright Lyra Network
+ * @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+ #}
+
+<div class="card-header">
+    <div class="card-title">
+        {{ 'sylius_lyra_plugin.ui.lyra_rest_api_keys.label'|trans }}
+    </div>
+</div>
+
+{% set form = hookable_metadata.context.form.gatewayConfig.config.lyra_rest_api_site_id %}
+
+<div class="col-12">
+    {{ form_row(form, sylius_test_form_attribute('config-lyra-rest-api-site-id')) }}
+</div>
