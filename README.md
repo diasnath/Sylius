@@ -8,7 +8,7 @@ Lyra Collect for Sylius is an open source plugin that links e-commerce websites 
 - Require the plugin with composer using the following command:
 
 ```
-composer require lyranetwork/sylius-lyranetwork-plugin dev-lyra
+composer require lyranetwork/sylius-lyranetwork-plugin dev-lyra-v2
 ```
 - Add the following line in  __bundles.php__  file located in `[sylius-root]/config/`:
 
