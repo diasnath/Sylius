@@ -1,0 +1,77 @@
+sylius_twig_hooks:
+  hooks:
+    base_payzen_fields: &payzen_fields
+      payzen_rest_api_site_id:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_rest_api_site_id.html.twig'
+        priority: 0
+      payzen_rest_api_mode:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_rest_api_mode.html.twig'
+        priority: 0
+      payzen_rest_api_rest_check_url:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_rest_api_rest_check_url.html.twig'
+        priority: 0
+      payzen_rest_api_private_test_key:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_rest_api_private_test_key.html.twig'
+        priority: 0
+      payzen_rest_api_private_prod_key:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_rest_api_private_prod_key.html.twig'
+        priority: 0
+      payzen_rest_api_public_test_key:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_rest_api_public_test_key.html.twig'
+        priority: 0
+      payzen_rest_api_public_prod_key:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_rest_public_prod_key.html.twig'
+        priority: 0
+      payzen_rest_api_hmac_test_key:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_rest_api_hmac_test_key.html.twig'
+        priority: 0
+      payzen_rest_api_hmac_prod_key:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_rest_api_hmac_prod_key.html.twig'
+        priority: 0
+      payzen_advanced_options_card_data_entry_mode:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_advanced_options_card_data_entry_mode.html.twig'
+        priority: 0
+      payzen_advanced_options_rest_theme:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_advanced_options_rest_theme.html.twig'
+        priority: 0
+      payzen_advanced_options_rest_attempts:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_advanced_options_rest_attempts.html.twig'
+        priority: 0
+      payzen_advanced_options_rest_popin_mode:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_advanced_options_rest_popin_mode.html.twig'
+        priority: 0
+      payzen_advanced_options_rest_compact_mode:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_advanced_options_rest_compact_mode.html.twig'
+        priority: 0
+      payzen_advanced_options_oneclick_payment:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_advanced_options_oneclick_payment.html.twig'
+        priority: 0
+      payzen_payment_options_capture_delay:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_payment_options_capture_delay.html.twig'
+        priority: 0
+      payzen_payment_options_validation_mode:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/form/payzen_payment_options_validation_mode.html.twig'
+        priority: 0
+
+    'sylius_admin.payment_method.create.content.form.sections.gateway_configuration.payzen_sylius_payment':
+      <<: *payzen_fields
+
+    'sylius_admin.payment_method.update.content.form.sections.gateway_configuration.payzen_sylius_payment':
+      <<: *payzen_fields
+
+    'sylius_admin.order.show.content.sections.payments.item':
+      name:
+        template: '@LyranetworkPayzenPlugin/admin/order/payment_details.html.twig'
+        priority: 150
+    'sylius_admin.order.show.content.sections.payments.item.actions':
+      refund:
+        template: '@LyranetworkPayzenPlugin/admin/order/payment_action_refund.html.twig'
+        priority: 150
+    'sylius_admin.payment_method.create.content.form.sections':
+      general:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/general.html.twig'
+        priority: 150
+    'sylius_admin.payment_method.update.content.form.sections':
+      general:
+        template: '@LyranetworkPayzenPlugin/admin/payment_method/general.html.twig'
+        priority: 150

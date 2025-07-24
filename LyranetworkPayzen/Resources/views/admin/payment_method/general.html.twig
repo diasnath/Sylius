@@ -1,0 +1,24 @@
+{#
+* Copyright © Lyra Network.
+* This file is part of PayZen plugin for Sylius. See COPYING.md for license details.
+*
+* @author    Lyra Network (https://www.lyra.com/)
+* @copyright Lyra Network
+* @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+#}
+
+{% set payzenGateway = constant('Lyranetwork\\Payzen\\Sdk\\Tools::FACTORY_NAME') %}
+{% if hookable_metadata.context.payment_method.gatewayConfig.factoryName is same as (payzenGateway) %}
+    {% include '@LyranetworkPayzenPlugin/_payzenMessage.html.twig' %}
+{% endif %}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <div class="card-title">{{ 'sylius.ui.general'|trans }}</div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% hook 'general' %}
+        </div>
+    </div>
+</div>

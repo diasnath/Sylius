@@ -1,6 +1,6 @@
-# Lyra Collect for Sylius
+# PayZen for Sylius
 
-Lyra Collect for Sylius is an open source plugin that links e-commerce websites based on Sylius to Lyra Collect secure payment gateway developed by [Lyra Network](https://www.lyra.com/).
+PayZen for Sylius is an open source plugin that links e-commerce websites based on Sylius to PayZen secure payment gateway developed by [Lyra Network](https://www.lyra.com/).
 
 ## Installation & Upgrade
 
@@ -8,27 +8,27 @@ Lyra Collect for Sylius is an open source plugin that links e-commerce websites 
 - Require the plugin with composer using the following command:
 
 ```
-composer require lyranetwork/sylius-lyranetwork-plugin dev-lyra-v2
+composer require lyranetwork/sylius-lyranetwork-plugin dev-payzen-v2
 ```
 - Add the following line in  __bundles.php__  file located in `[sylius-root]/config/`:
 
 ```
-Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
+Lyranetwork\Payzen\LyranetworkPayzenPlugin::class => ['all' => true],
 ```
 
-- Add Lyra routes in  __routes.yaml__  file located in `[sylius-root]/config/`:
+- Add Payzen routes in  __routes.yaml__  file located in `[sylius-root]/config/`:
 
  ```yaml
- sylius_lyra:
-    resource: "@LyranetworkLyraPlugin/Resources/config/routing.yaml"
+ sylius_payzen:
+    resource: "@LyranetworkPayzenPlugin/Resources/config/routing.yaml"
  ```
 
-- Add Lyra config in ___sylius.yaml__  file located in `[sylius-root]/config/packages` :
+- Add Payzen config in ___sylius.yaml__  file located in `[sylius-root]/config/packages` :
 
 ```
 imports:
 [...]
-    - { resource: "@LyranetworkLyraPlugin/Resources/config/config.yaml" }
+    - { resource: "@LyranetworkPayzenPlugin/Resources/config/config.yaml" }
 ```
 
 - Dump the autoload cache using the following command:
@@ -50,27 +50,27 @@ The plugin should be now available in the list of payment methods that you can c
 - Add in file `[sylius-root]/composer.json`, in autoload psr-4 the following line:
 
 ```
-"Lyranetwork\\Lyra\\": "LyranetworkLyra/src/"
+"Lyranetwork\\Payzen\\": "LyranetworkPayzen/src/"
 ```
 - Add the following line in  __bundles.php__  file located in `[sylius-root]/config/`:
 
 ```
-Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
+Lyranetwork\Payzen\LyranetworkPayzenPlugin::class => ['all' => true],
 ```
 
-- Add Lyra routes in  __routes.yaml__  file located in `[sylius-root]/config/`:
+- Add Payzen routes in  __routes.yaml__  file located in `[sylius-root]/config/`:
 
  ```yaml
- sylius_lyra:
-    resource: "@LyranetworkLyraPlugin/Resources/config/routing.yaml"
+ sylius_payzen:
+    resource: "@LyranetworkPayzenPlugin/Resources/config/routing.yaml"
  ```
 
-- Add Lyra config in ___sylius.yaml__  file located in `[sylius-root]/config/packages` :
+- Add Payzen config in ___sylius.yaml__  file located in `[sylius-root]/config/packages` :
 
 ```
 imports:
 [...]
-    - { resource: "@LyranetworkLyraPlugin/Resources/config/config.yaml" }
+    - { resource: "@LyranetworkPayzenPlugin/Resources/config/config.yaml" }
 ```
 
 - Dump the autoload cache using the following command:
@@ -82,12 +82,12 @@ composer dump-autoload
 - Open command line in Sylius root directory, and run the following commands to extract the translations for the plugin:
 
 ```
-php bin/console translation:extract en LyranetworkLyraPlugin --dump-messages
-php bin/console translation:extract fr LyranetworkLyraPlugin --dump-messages
-php bin/console translation:extract es LyranetworkLyraPlugin --dump-messages
-php bin/console translation:extract de LyranetworkLyraPlugin --dump-messages
-php bin/console translation:extract pt LyranetworkLyraPlugin --dump-messages
-php bin/console translation:extract br LyranetworkLyraPlugin --dump-messages
+php bin/console translation:extract en LyranetworkPayzenPlugin --dump-messages
+php bin/console translation:extract fr LyranetworkPayzenPlugin --dump-messages
+php bin/console translation:extract es LyranetworkPayzenPlugin --dump-messages
+php bin/console translation:extract de LyranetworkPayzenPlugin --dump-messages
+php bin/console translation:extract pt LyranetworkPayzenPlugin --dump-messages
+php bin/console translation:extract br LyranetworkPayzenPlugin --dump-messages
 ```
 
 - Empty the cache with the following command:
@@ -102,8 +102,8 @@ The plugin should be now available in the list of payment methods that you can c
 In the Sylius administration interface:
 - Go to `Configuration > Payment methods`.
 - Click on `Create` button on the top right of the page to display the list of available payment methods.
-- Choose `Payment by Lyra Collect` to add and configure it.
-- You can now enter your Lyra Collect credentials and configure your payment method. 
+- Choose `Payment by PayZen` to add and configure it.
+- You can now enter your PayZen credentials and configure your payment method. 
 - Don't forget to give your payment method a code, to set the name in the language sections at the bottom and to save by clicking the `Create` button.
 
 ## Uninstallation
@@ -114,33 +114,33 @@ composer remove lyranetwork/sylius-lyranetwork-plugin
 ```
 
 ### With module zip file
-- Delete LyranetworkLyra folder in your Sylius root folder
+- Delete LyranetworkPayzen folder in your Sylius root folder
 - Remove in file `sylius/composer.json`, in autoload psr-4 the line:
 
 ```
-"Lyranetwork\\Lyra\\": "LyranetworkLyra/src/"
+"Lyranetwork\\Payzen\\": "LyranetworkPayzen/src/"
 ```
 
 ### Remove and revert changes
 - Remove the following line in  __bundles.php__  file located in `[sylius-root]/config/`:
 
 ```
-Lyranetwork\Lyra\LyranetworkLyraPlugin::class => ['all' => true],
+Lyranetwork\Payzen\LyranetworkPayzenPlugin::class => ['all' => true],
 ```
 
-- Remove Lyra routes in  __routes.yaml__  file located in `[sylius-root]/config/`
+- Remove Payzen routes in  __routes.yaml__  file located in `[sylius-root]/config/`
 
 ```yaml
- sylius_lyra:
-    resource: "@LyranetworkLyraPlugin/Resources/config/routing.yaml"
+ sylius_payzen:
+    resource: "@LyranetworkPayzenPlugin/Resources/config/routing.yaml"
 ```
 
-- Remove Lyra config in ___sylius.yaml__  file located in `[sylius-root]/config/packages` :
+- Remove Payzen config in ___sylius.yaml__  file located in `[sylius-root]/config/packages` :
 
 ```
 imports:
 [...]
-    - { resource: "@LyranetworkLyraPlugin/Resources/config/config.yaml" }
+    - { resource: "@LyranetworkPayzenPlugin/Resources/config/config.yaml" }
 ```
 
 - Open command line in Sylius root directory, and run the following commands:
@@ -151,6 +151,6 @@ php bin/console cache:clear
 ```
 ## License
 
-Each Lyra Collect payment module source file included in this distribution is licensed under the The MIT License (MIT).
+Each PayZen payment module source file included in this distribution is licensed under the The MIT License (MIT).
 
 Please see LICENSE.txt for the full text of the MIT license. It is also available through the world-wide-web at this URL: https://opensource.org/licenses/mit-license.html.

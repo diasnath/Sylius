@@ -1,0 +1,104 @@
+sylius_payzen_plugin:
+  ui:
+    payzen_payment_method_title: Pagamento com PayZen
+    payzen_developed_by: Desenvolvido por
+    payzen_support_email: 'Email de contato: '
+    payzen_module_version: 'Versão do módulo: '
+    payzen_gateway_version: 'Versão da plataforma: '
+    payzen_documentation_link: 'Clique para consultar a documentação da configuração do módulo: '
+    payzen_advanced_options: OPÇÕES AVANÇADAS
+    payzen_payment_options: OPÇÕES DE PAGAMENTO
+    payzen_restrictions: RESTRIÇÕES
+    payzen_rest_api_keys:
+      label: CHAVES DE API REST
+      desc: 'As chaves do API REST estão disponíveis no seu Back Office PayZen (menu: Configurações > Lojas > Chaves de API REST).'
+    payzen_site_id:
+      label: Código da loja
+      helptext: Código dado pelo PayZen.
+    payzen_mode:
+      label: Modo
+      helptext: Modo de funcionamento do módulo.
+    payzen_private_test_key:
+      label: Senha de teste
+    payzen_private_prod_key:
+      label: Senha de produção
+    payzen_rest_server_url:
+      label: URL do servidor do API REST
+    payzen_public_test_key:
+      label: Chave pública de teste
+    payzen_public_prod_key:
+      label: Chave pública de produção
+    payzen_hmac_test_key:
+      label: Chave HMAC-SHA-256 de teste
+    payzen_hmac_prod_key:
+      label: Chave HMAC-SHA-256 de produção
+    payzen_rest_check_url:
+      label: URL de notificação do API REST
+      helptext: URL para copiar no Back Office PayZen > Configurações > Regras de notificações. Em modo multi-loja, a URL de notificação é a mesma para todas as lojas.
+    payzen_js_client_url:
+      label: URL do cliente JavaScript
+    payzen_card_data_entry_mode:
+      label: Modo de digitar os dados de pagamento
+      helptext: Selecione a maneira como serão digitados os dados de pagamento. Atenção, para usar el Smartform, verifique que contratou esta opção no PayZen.
+    payzen_rest_popin_mode:
+      label: Mostrar en una ventana pop-in
+      helptext: Esta opção permite exibir o Smartform en una ventana pop-in.
+    payzen_rest_theme:
+      label: Temas
+      helptext: Selecione um tema para exibir o Smartform.
+    payzen_rest_compact_mode:
+      label: Modo compacto
+      helptext: Esta opção permite exibir o Smartform em modo compacto.
+    payzen_capture_delay:
+      label: Prazo de captura (se for aplicável)
+      helptext: A quantidade de dias antes da captura no banco (pode ser configurado no seu Back Office PayZen).
+    payzen_validation_mode:
+      label: Modo de validação (se for aplicável)
+      helptext: Em modo manual, deve confirmar os pagamentos no Back Office PayZen.
+    payzen_rest_attempts:
+      label: Quantidade de tentativas de pagamento com cartão
+      helptext: Número máximo de tentativas de pagamento com cartão após um pagamento não sucedido (entre 0 e 2). Se este valor não for informado, o valor default será de 2.
+    payzen_oneclick_payment:
+      label: Pagamento por token
+      helptext: Esta opção permite pagar um pedido sem digitar de novo os dados bancários a cada pagamento. A opção « Pagamento por token » deve ser ativada na sua loja Back Office PayZen para usar esta funcionalidade.
+    transaction_id: "Transação ID: "
+    transaction_uuid: "Transação UUID: "
+    card_brand: "Bandeira de cartão: "
+    account:
+      saved_cards:
+        title: "Métodos de pagamento"
+        error: "Nenhum método salvo encontrado."
+  config:
+    all: TODAS
+    test: TEST
+    production: PRODUCTION
+    smartform:
+      mode_smartform: Smartform incorporado en el sitio web vendedor (API REST)
+      mode_smartform_ext_with_logos: Smartform extendido incorporado en el sitio web vendedor com logotipos (API REST)
+      mode_smartform_ext_without_logos: Smartform extendido incorporado en el sitio web vendedor sem logotipos (API REST)
+    theme:
+      neon: Neon
+      classic: Classic
+    validation:
+      backoffice: Configuração Back Office PayZen
+      automatic: Automático
+      manual: Manual
+  payment:
+    fatal: Ocorreu um erro no processo de pagamento.
+    check_url_warn: A validação automática não foi realizada com sucesso. Configurou corretamente a URL de notificação no Back Office PayZen?
+    prodfaq: "PASSAR EM PRODUÇÃO: Para saber como passar sua loja em produção, favor consultar os capítulos « Realizar a fase de teste » e « Passar uma loja em modo produção » da documentação do módulo."
+  refund:
+    error:
+      backoffice_action: "Não esqueça de fazer as modificações necessárias no Back Office %1$s."
+      private_key: "Impossível fazer reembolso online para o pedido: a senha não está configurada."
+"Refund of split payment is not supported. Please, consider making necessary changes in %1$s Back Office.": "Reembolso de pagamento fracionado não é suportado. Não esqueça de fazer as modificações necessárias no Back Office %1$s."
+"Remaining amount (%1$s %2$s) is less than requested refund amount (%3$s %2$s).": "O valor faltando (%1$s %2$s) é inferior ao valor do reembolso solicitado (%3$s %2$s)."
+"Payment is refunded/canceled only in %1$s. Please, consider making necessary changes in %2$s Back Office.": "O pagamento é somente reembolsado/cancelado no %1$s. Não esqueça de fazer as modificações necessárias no Back Office %2$s."
+"Chargebacks cannot be refunded.": "Não é possível reembolsar uma transação com pagamento pendente."
+"Error occurred when refunding payment for order #%1$s. Please consult the payment module log for more details.": "Ocorreu um erro durante o reembolso do pedido #%1$s. Favor consultar os logs de Back Office PayZen para maiores detalhes."
+"Cannot refund payment for order #%1$s.": "Não é possível reembolsar o pedido #%1$s."
+"Refund error": "Erro de reembolso"
+"Unexpected transaction status received (%1$s).": "Status de transação inesperado (%1$s)."
+"No paid transaction found for order ID [%s]": "No paid transaction found for order ID [%s]"
+"Unexpected transaction type received (%1$s).": "Tipo de transação inesperado recebido (%1$s)."
+"Transaction amount (%1$s %2$s) is less than requested refund amount (%3$s %2$s).": "O valor da transação (%1$s %2$s) é inferior ao valor do reembolso solicitado (%3$s %2$s)."

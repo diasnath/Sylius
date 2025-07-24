@@ -1,0 +1,28 @@
+{#
+* Copyright © Lyra Network.
+* This file is part of PayZen plugin for Sylius. See COPYING.md for license details.
+*
+* @author    Lyra Network (https://www.lyra.com/)
+* @copyright Lyra Network
+* @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+#}
+
+{% set order = hookable_metadata.context.resource %}
+{% set payment = hookable_metadata.context.payment %}
+{% set payzenGateway = constant('Lyranetwork\\Payzen\\Sdk\\Tools::FACTORY_NAME') %}
+
+{% if sylius_sm_can(payment, constant('Sylius\\Component\\Payment\\PaymentTransitions::GRAPH'), constant('Sylius\\Component\\Payment\\PaymentTransitions::TRANSITION_REFUND')) %}
+    <form
+            {% if payment.details['payzen_factory_name'] is defined and payment.details['payzen_factory_name'] is same as (payzenGateway) %}
+                action="{{ path('payzen_payment_refund', {'orderId': order.id, 'id': payment.id}) }}"
+            {% else %}
+                action="{{ path('sylius_admin_order_payment_refund', {'orderId': order.id, 'id': payment.id}) }}"
+            {%endif%}
+            method="POST" novalidate>
+        <input type="hidden" name="_method" value="PUT">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token(payment.id) }}" />
+        <button type="submit" class="btn" {{ sylius_test_html_attribute('refund-payment', payment.id) }}>
+            {{ ux_icon('tabler:arrow-back-up-double') }} {{ 'sylius.ui.refund'|trans }}
+        </button>
+    </form>
+{% endif %}

@@ -1,0 +1,14 @@
+sylius_twig_hooks:
+  hooks:
+    'sylius_shop.checkout.select_payment.content.form.select_payment.payment.choice.payzen_sylius_payment':
+      details:
+        template: '@LyranetworkPayzenPlugin/shop/checkout/select-payment/payzen_choice.html.twig'
+        priority: 150
+    'sylius_shop.order.show.content.form.select_payment.payment.choice.payzen_sylius_payment':
+      details:
+        template: '@LyranetworkPayzenPlugin/shop/checkout/select-payment/payzen_choice.html.twig'
+        priority: 150
+    'sylius_shop.account.payzen.saved_cards.index.content.main':
+      section:
+        template: '@LyranetworkPayzenPlugin/shop/account/saved_cards/section.html.twig'
+        priority: 150

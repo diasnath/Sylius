@@ -1,0 +1,169 @@
+{#
+* Copyright © Lyra Network.
+* This file is part of PayZen plugin for Sylius. See COPYING.md for license details.
+*
+* @author    Lyra Network (https://www.lyra.com/)
+* @copyright Lyra Network
+* @license   https://opensource.org/licenses/mit-license.html The MIT License (MIT)
+#}
+
+{% set methodCode = '' %}
+{% if instanceCode is defined %}
+    {% set methodCode = instanceCode %}
+{% else %}
+    {% set methodCode = method.code %}
+{% endif %}
+
+{% set payzenFormConfig = payzen_get_smartform_config(methodCode) %}
+
+{% if order is defined %}
+    {% set formToken, returnUrl, popin, dataEntryMode, logoHeader = payzen_get_smartform_token(order, methodCode).formToken, path('payzen_return_url'), '', '', '' %}
+    {% set single = 'kr-single-payment-button' %}
+    {% if payzenFormConfig.popinMode %}
+        {% set popin = 'kr-popin' %}
+        {% set single = '' %}
+    {% endif %}
+
+    {% if payzenFormConfig.cardDataEntryMode is same as('MODE_SMARTFORM_EXT_WITH_LOGOS') or payzenFormConfig.cardDataEntryMode is same as('MODE_SMARTFORM_EXT_WITHOUT_LOGOS') %}
+        {% set dataEntryMode = 'kr-card-form-expanded' %}
+    {% endif %}
+
+    {% if payzenFormConfig.cardDataEntryMode is same as('MODE_SMARTFORM_EXT_WITHOUT_LOGOS') %}
+        {% set logoHeader = 'kr-no-card-logo-header ' %}
+    {% endif %}
+{% elseif accountToken is not empty %}
+    {% set formToken, returnUrl, popin, dataEntryMode, logoHeader, single = accountToken, path('payzen_sylius_account_saved_cards'), '', 'kr-card-form-expanded', '', '' %}
+{% endif %}
+
+<div id="payzenPaymentMethodForm">
+    <script src="{{ payzenFormConfig.jsClient }}js/krypton-client/V4.0/stable/kr-payment-form.min.js"
+        kr-public-key="{{ payzenFormConfig.pubKey }}"
+        kr-language="{{ payzenFormConfig.language }}"
+        kr-post-url-success="{{ returnUrl }}"
+        kr-post-url-refused="{{ returnUrl }}"
+    ></script>
+    <link rel="stylesheet" href="{{ payzenFormConfig.jsClient }}js/krypton-client/V4.0/ext/{{ payzenFormConfig.theme }}-reset.css">
+    <script src="{{ payzenFormConfig.jsClient }}js/krypton-client/V4.0/ext/{{ payzenFormConfig.theme }}.js"></script>
+
+    <div class="kr-smart-form" {{ single }} {{ popin }} {{ dataEntryMode }} {{ logoHeader }} kr-form-token="{{formToken}}" style="z-index: 3; width: 100%;"></div>
+    {% if order is defined %}
+        <script>
+            let redirectOnClose = "";
+            function init() {
+                const payzenCheckBox = $("input[type='radio'][value='{{ methodCode }}']");
+                if (payzenCheckBox) {
+                    configureSmartform();
+                    togglePaymentMethodTitle();
+                }
+            }
+
+            function togglePaymentMethodTitle() {
+                const popin = '{{payzenFormConfig.popinMode}}' === '1';
+                const nbMethod = $("input[type='radio']").length;
+                const payzenCheckBox = $("input[type='radio'][value='{{ methodCode }}']");
+                if (! popin && nbMethod == 1) {
+                    $(".payzenPaymentChoiceTitle").each(function () {
+                        this.style.setProperty('display', 'none', 'important')
+                    });
+                }
+
+                payzenCheckBox.prop("checked", true);
+            }
+
+            function toggleSubmitButton(enabled) {
+                const submitButton = $("form[name='sylius_checkout_select_payment'] button[type='submit']");
+                submitButton.prop('disabled', !enabled);
+            }
+
+            async function handleButtonsDisplay() {
+                const payzenCheckBox = $("input[type='radio'][value='{{ methodCode }}']");
+                const smartform = $('#payzenPaymentMethodForm');
+
+                if (payzenCheckBox.is(":checked")) {
+                    smartform.show();
+                } else {
+                    smartform.hide();
+                    if (redirectOnClose !== "") {
+                        document.location.href = redirectOnClose;
+                    }
+                }
+            }
+
+            function openSmartform(event) {
+                const popin = '{{payzenFormConfig.popinMode}}' === '1';
+                let paymentForm = $('form[name="sylius_shop_checkout_select_payment"]');
+                if (paymentForm.length < 1) {
+                    paymentForm = $('form[name="sylius_checkout_select_payment"]');
+                }
+                const payzenCheckBox = $("input[type='radio'][value='{{ methodCode }}']");
+                if (payzenCheckBox.is(":checked")) {
+                    event.preventDefault();
+                    toggleSubmitButton(false);
+                    paymentForm.removeClass('loading');
+
+                    // Refresh form token.
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ path("payzen_rest_form_token") }}',
+                        data: { 'orderIdDB': '{{ order.id }}', "instanceCode": '{{ methodCode }}' },
+                        success: function(data) {
+                            redirectOnClose = data.redirectOnClose;
+
+                            KR.setFormConfig({
+                                formToken: data.formToken
+                            }).then(function(v) {
+                                KR = v.KR;
+                                if (popin) {
+                                    KR.openPopin();
+                                } else {
+                                    KR.openSelectedPaymentMethod();
+                                }
+                            })
+                        }
+                    });
+                }
+            }
+
+            function configureSmartform() {
+                let paymentForm = $('form[name="sylius_shop_checkout_select_payment"]');
+                if (paymentForm.length < 1) {
+                    paymentForm = $('form[name="sylius_checkout_select_payment"]');
+                }
+
+                if ('{{payzenFormConfig.compactMode}}') {
+                    KR.setFormConfig({ cardForm: { layout: "compact" }, smartForm: { layout: "compact" }});
+                }
+
+                KR.setFormConfig({
+                    language: '{{payzenFormConfig.language}}',
+                    form: { smartform: { singlePaymentButton: { visibility: false }}}
+                });
+
+                KR.onError(function() {
+                    toggleSubmitButton(true);
+                });
+
+                KR.onPopinClosed(function() {
+                    toggleSubmitButton(true)
+                });
+
+                paymentForm.on('submit', openSmartform);
+                $("input[type='radio']").on('change', handleButtonsDisplay);
+                KR.onFormReady(handleButtonsDisplay);
+            }
+
+            document.addEventListener("DOMContentLoaded", init, false);
+        </script>
+
+        <style>
+            .kr-smart-form-modal-button, .kr-methods-list-card-form-wrapper .kr-card-form .kr-payment-button {
+                display: none !important;
+            }
+
+            label.kr-method-label, label.kr-amount-label {
+                margin: 0 !important;
+                font-size: 13px !important;
+            }
+        </style>
+    {% endif %}
+</div>

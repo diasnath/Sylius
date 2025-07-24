@@ -1,0 +1,35 @@
+payzen_return_url:
+  path: /payzen/rest/return
+  methods: [POST, GET]
+  defaults:
+    _controller: 'Lyranetwork\Payzen\Controller\OrderController::paymentResponseAction'
+
+payzen_rest_ipn:
+  path: /payzen/rest/ipn
+  methods: [POST, GET]
+  defaults:
+    _controller: 'Lyranetwork\Payzen\Controller\OrderController::paymentResponseAction'
+
+payzen_payment_refund:
+  path: /payzen/orders/{orderId}/payments/{id}/refund
+  methods: [PUT, POST]
+  defaults:
+    _controller: 'Lyranetwork\Payzen\Controller\RefundController::paymentRefundOrCancelAction'
+
+payzen_sylius_account_saved_cards:
+  path: /{_locale}/payzen/account/saved-cards
+  methods: [POST, GET]
+  defaults:
+    _controller: 'Lyranetwork\Payzen\Controller\CardController::savedCardsAction'
+
+payzen_rest_form_token:
+  path: /payzen/rest/formtoken
+  methods: [POST]
+  defaults:
+    _controller: 'Lyranetwork\Payzen\Controller\OrderController::getFormToken'
+
+payzen_headless_return_url:
+  path: /payzen/rest/headless/return
+  methods: [POST, GET]
+  defaults:
+    _controller: 'Lyranetwork\Payzen\Controller\OrderController::paymentResponseAction'

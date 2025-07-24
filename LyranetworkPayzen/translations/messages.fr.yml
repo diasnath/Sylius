@@ -1,0 +1,104 @@
+sylius_payzen_plugin:
+  ui:
+    payzen_payment_method_title: Paiement par PayZen
+    payzen_developed_by: Développé par
+    payzen_support_email: 'Courriel de contact: '
+    payzen_module_version: 'Version du module: '
+    payzen_gateway_version: 'Version de la plateforme: '
+    payzen_documentation_link: 'Cliquer pour accéder à la documentation de configuration du module: '
+    payzen_advanced_options: OPTIONS AVANCÉES
+    payzen_payment_options: OPTIONS DE PAIEMENT
+    payzen_restrictions: RESTRICTIONS
+    payzen_rest_api_keys:
+      label: CLÉS D'API REST
+      desc: "Les clés de l'API REST sont disponibles dans votre Back Office PayZen (menu: Paramétrage > Boutiques > Clés d'API REST)."
+    payzen_site_id:
+      label: Identifiant boutique
+      helptext: Identifiant fourni par PayZen.
+    payzen_mode:
+      label: Mode
+      helptext: Mode de fonctionnement du module.
+    payzen_private_test_key:
+      label: Mot de passe de test
+    payzen_private_prod_key:
+      label: Mot de passe de production
+    payzen_rest_server_url:
+      label: URL du serveur de l'API REST
+    payzen_public_test_key:
+      label: Clé publique de test
+    payzen_public_prod_key:
+      label: Clé publique de production
+    payzen_hmac_test_key:
+      label: Clé HMAC-SHA-256 de test
+    payzen_hmac_prod_key:
+      label: Clé HMAC-SHA-256 de production
+    payzen_rest_check_url:
+      label: URL de notification de l'API REST
+      helptext: URL à copier dans le Back Office PayZen > Paramétrage > Règles de notifications. En mode multi-boutique, l'URL de notification est la même pour toutes les boutiques.
+    payzen_js_client_url:
+      label: URL du client JavaScript
+    payzen_card_data_entry_mode:
+      label: Mode de saisie des données de paiement
+      helptext: Sélectionner la manière dont seront saisies les données de paiement. Attention, pour utiliser le Smartform, vous devez vous assurer d'avoir souscrit à cette option auprès de PayZen.
+    payzen_rest_popin_mode:
+      label: Afficher dans une pop-in
+      helptext: Cette option permet d'afficher le Smartform dans une pop-in.
+    payzen_rest_theme:
+      label: Thème
+      helptext: Sélectionnez le thème à utiliser pour le Smartform.
+    payzen_rest_compact_mode:
+      label: Mode compact
+      helptext: Cette option permet d'afficher le Smartform en mode compact.
+    payzen_capture_delay:
+      label: Délai avant remise en banque (si applicable)
+      helptext: Le nombre de jours avant la remise en banque (paramétrable sur votre Back Office PayZen).
+    payzen_validation_mode:
+      label: Mode de validation (si applicable)
+      helptext: En mode manuel, vous devrez confirmer les paiements dans le Back Office PayZen.
+    payzen_rest_attempts:
+      label: Nombre de tentatives de paiement par carte
+      helptext: Nombre maximum de tentatives de paiement par carte après un paiement en échec (entre 0 et 2). Si vide, la valeur par défaut de la plateforme est 2.
+    payzen_oneclick_payment:
+      label: Paiement par alias
+      helptext: Cette option permet à l'acheteur de sauvegarder ses données bancaires pour les utiliser lors des paiements ultérieurs. L'option « Paiement par alias » doit être activée sur votre boutique Back Office PayZen pour utiliser cette fonctionnalité.
+    transaction_id: "ID de transaction: "
+    transaction_uuid: "UUID de transaction: "
+    card_brand: "Marque de carte: "
+    account:
+      saved_cards:
+        title: "Méthodes de paiement"
+        error: "Aucune méthode enregistrée trouvée."
+  config:
+    all: TOUTES
+    test: TEST
+    production: PRODUCTION
+    smartform:
+      mode_smartform: Smartform embarqué sur le site marchand (API REST)
+      mode_smartform_ext_with_logos: Smartform étendu embarqué sur le site marchand avec les logos (API REST)
+      mode_smartform_ext_without_logos: Smartform étendu embarqué sur le site marchand sans les logos (API REST)
+    theme:
+      neon: Neon
+      classic: Classic
+    validation:
+      backoffice: Configuration Back Office PayZen
+      automatic: Automatique
+      manual: Manuelle
+  payment:
+    fatal: Une erreur est survenue durant le processus de paiement.
+    check_url_warn: La validation automatique n'a pas fonctionné. Avez-vous configuré correctement l'URL de notification dans le Back Office PayZen?
+    prodfaq: "PASSAGE EN PRODUCTION: Vous souhaitez savoir comment passer votre boutique en production, merci de consulter les chapitres « Procéder à la phase des tests » et « Passage d'une boutique en mode production » de la documentation du module."
+  refund:
+    error:
+      backoffice_action: "Pensez à apporter les modifications nécessaires dans le Back Office %1$s."
+      private_key: "Impossible de rembourser la commande en ligne: le mot de passe n'est pas configuré."
+"Refund of split payment is not supported. Please, consider making necessary changes in %1$s Back Office.": "Refund of split payment is not supported. Please, consider making necessary changes in %1$s Back Office."
+"Remaining amount (%1$s %2$s) is less than requested refund amount (%3$s %2$s).": "Le montant restant (%1$s %2$s) est inférieur au montant du remboursement demandé (%3$s %2$s)."
+"Payment is refunded/canceled only in %1$s. Please, consider making necessary changes in %2$s Back Office.": "Le paiement est remboursé/annulé uniquement dans %1$s. Pensez à apporter les modifications nécessaires dans le Back Office %2$s."
+"Chargebacks cannot be refunded.": "Il est impossible de rembourser une transaction impayée."
+"Error occurred when refunding payment for order #%1$s. Please consult the payment module log for more details.": "Une erreur est survenue lors du remboursement de la commande #%1$s. Veuillez consulter les logs de Back Office PayZen pour plus de détails."
+"Cannot refund payment for order #%1$s.": "Impossible de rembourser la commande #%1$s."
+"Refund error": "Erreur de remboursement"
+"Unexpected transaction status received (%1$s).": "Statut de transaction inattendu (%1$s)."
+"No paid transaction found for order ID [%s]": "No paid transaction found for order ID [%s]"
+"Unexpected transaction type received (%1$s).": "Type de transaction inattendu reçu (%1$s)."
+"Transaction amount (%1$s %2$s) is less than requested refund amount (%3$s %2$s).": "Le montant de la transaction (%1$s %2$s) est inférieur au montant du remboursement demandé (%3$s %2$s)."
