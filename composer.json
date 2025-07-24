@@ -17,7 +17,7 @@
 		"php" : "^8.0",
 		"sylius/sylius" : "^2.0",
 		"sylius/mailer-bundle" : "^1.8 || ^2.0@beta",
-		"symfony/webpack-encore-bundle" : "^2.O"
+		"symfony/webpack-encore-bundle" : "^2.2"
 	},
 	"require-dev" : {
 		"behat/behat" : "^3.6.1",
