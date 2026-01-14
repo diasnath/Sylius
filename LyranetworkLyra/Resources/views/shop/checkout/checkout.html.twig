@@ -1,0 +1,27 @@
+{% extends '@SyliusShop/checkout/common/layout.html.twig' %}
+
+{% set prefixes = ['lyra_sylius_plugin.shop.order_pay.capture', 'sylius_shop.checkout'] %}
+
+{% block body %}
+    <div class="d-flex flex-column min-vh-100 overflow-hidden">
+        <div class="bg-white border-bottom py-4">
+            <div class="container">
+                <div class="row align-items-center">
+                    {% hook 'common.header' with { _prefixes: prefixes, order } %}
+                </div>
+            </div>
+        </div>
+        <div class="flex-grow-1 d-flex align-items-stretch">
+            <div class="container">
+                <div class="row h-100">
+                    <div class="col pt-4 pb-5">
+                        {{ include ('@LyranetworkLyraPlugin/_lyraSmartform.html.twig', {'method': method, 'order': order, 'returnUrl': return_url}) }}
+                    </div>
+                    <div class="col-12 col-lg-5 py-5 ps-lg-6 position-relative checkout-sidebar">
+                        {% hook 'common.sidebar' with { _prefixes: prefixes, order } %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
