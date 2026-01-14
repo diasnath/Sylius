@@ -1,5 +1,5 @@
 {
-	"name" : "ndias/sylius-ndias-plugin",
+	"name" : "nathand/sylius-ndias-plugin",
 	"description" : "This plugin enables you to setup the Lyra Collect payment gateway on your Sylius website.",
 	"version" : "3.0.0",
 	"type" : "sylius-plugin",
