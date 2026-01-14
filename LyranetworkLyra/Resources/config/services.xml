@@ -12,6 +12,19 @@
 
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
+        <service id="monolog.handler.lyra_stream" class="Monolog\Handler\StreamHandler" public="false">
+            <argument>%kernel.logs_dir%/lyra.log</argument>
+            <argument>200</argument>
+            <argument>false</argument>
+        </service>
+
+        <service id="monolog.logger.lyra" class="Monolog\Logger" public="false">
+            <argument>lyra</argument>
+            <argument type="collection">
+                <argument type="service" id="monolog.handler.lyra_stream" />
+            </argument>
+        </service>
+
         <service id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface"
                  class="Lyranetwork\Lyra\Repository\PaymentMethodRepository"
                  parent="sylius.repository.payment_method">
@@ -39,9 +52,8 @@
         </service>
 
         <service id="Lyranetwork\Lyra\Service\OrderService">
-            <argument type="service" id="Lyranetwork\Lyra\Repository\OrderRepositoryInterface" />
             <argument type="service" id="Sylius\Bundle\CoreBundle\Mailer\OrderEmailManagerInterface" />
-            <argument type="service" id="logger" />
+            <argument type="service" id="monolog.logger.lyra" />
         </service>
 
         <service id="Lyranetwork\Lyra\Service\RefundService">
@@ -52,32 +64,34 @@
 
         <service id="Lyranetwork\Lyra\Sdk\RestData">
             <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
-            <argument type="service" id="logger" />
+            <argument type="service" id="monolog.logger.lyra" />
             <argument type="service" id="router" />
             <argument type="service" id="sylius.repository.customer" />
             <argument type="service" id="request_stack" />
         </service>
 
         <service id="Lyranetwork\Lyra\Sdk\RefundProcessor" public="true">
-            <argument type="service" id="logger" />
+            <argument type="service" id="monolog.logger.lyra" />
             <argument type="service" id="translator" />
             <argument type="service" id="request_stack" />
             <argument type="service" id="Lyranetwork\Lyra\Repository\OrderRepositoryInterface" />
             <argument type="service" id="sylius.manager.payment" />
-            <argument type="service" id="sylius_abstraction.state_machine"/>
+            <argument type="service" id="sylius_abstraction.state_machine" />
         </service>
 
         <service id="sylius_lyra_plugin.twig.extension.smartform_provider" class="Lyranetwork\Lyra\Twig\Extensions\SmartformProvider">
-            <argument type="service" id="logger" />
+            <argument type="service" id="monolog.logger.lyra" />
             <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
             <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
             <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
-            <argument type="service" id="sylius_abstraction.state_machine"/>
+            <argument type="service" id="sylius_abstraction.state_machine" />
             <argument type="service" id="sylius.context.locale" />
             <tag name="twig.extension" />
         </service>
 
         <service id="sylius_lyra_plugin.twig.extension.configuration_provider" class="Lyranetwork\Lyra\Twig\Extensions\ConfigurationProvider">
+            <argument type="service" id="translator" />
+            <argument type="service" id="request_stack" />
             <tag name="twig.extension" />
         </service>
 
@@ -87,7 +101,6 @@
             <argument type="service" id="sylius.context.channel" />
             <tag name="kernel.event_listener" event="sylius.menu.shop.account" method="addAccountMenuItems" />
         </service>
-
 
         <service id="sylius_lyra_plugin.event_listener.order_workflow" class="Lyranetwork\Lyra\EventListener\OrderWorkflowListener">
             <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
@@ -108,26 +121,80 @@
             <tag name="controller.service_arguments" />
         </service>
 
-        <service id="Lyranetwork\Lyra\Controller\RefundController" public="true">
-            <argument type="service" id="sylius.repository.payment" />
-            <argument type="service" id="logger" />
-            <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
-            <argument type="service" id="Lyranetwork\Lyra\Service\RefundService" />
-            <argument type="service" id="sylius.manager.payment" />
-            <argument type="service" id="request_stack" />
-            <argument type="service" id="sylius_abstraction.state_machine"/>
+        <service id="lyranetwork.lyra.command_provider.lyra_sylius_payment" class="Sylius\Bundle\PaymentBundle\CommandProvider\ActionsCommandProvider">
+            <argument type="tagged_locator" tag="lyranetwork.lyra.command_provider.lyra_sylius_payment" index-by="action" />
+            <tag name="sylius.payment_request.command_provider" gateway-factory="lyra_sylius_payment" />
         </service>
 
-        <service id="Lyranetwork\Lyra\Controller\OrderController" public="true" parent="sylius.controller.order">
-            <argument type="service" id="logger" />
-            <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
+        <service id="lyranetwork.lyra.command_provider.sylius_payment_capture" class="Lyranetwork\Lyra\CommandProvider\CapturePaymentRequestCommandProvider">
+            <tag name="lyranetwork.lyra.command_provider.lyra_sylius_payment" action="capture"/>
+        </service>
+
+        <service id="lyranetwork.lyra.command.sylius_payment_capture" class="Lyranetwork\Lyra\Command\CapturePaymentRequest">
+        </service>
+
+        <service id="lyranetwork.lyra.command_handler.sylius_payment_capture" class="Lyranetwork\Lyra\CommandHandler\CapturePaymentRequestHandler">
+            <argument type="service" id="sylius.provider.payment_request" />
+            <argument type="service" id="sylius_abstraction.state_machine" />
+            <tag name="messenger.message_handler" bus="sylius.payment_request.command_bus"/>
+        </service>
+
+        <service id="lyranetwork.lyra.command_provider.sylius_payment_status" class="Lyranetwork\Lyra\CommandProvider\StatusPaymentRequestCommandProvider">
+            <tag name="lyranetwork.lyra.command_provider.lyra_sylius_payment" action="status"/>
+        </service>
+
+        <service id="lyranetwork.lyra.command.sylius_payment_status" class="Lyranetwork\Lyra\Command\StatusPaymentRequest">
+        </service>
+
+        <service id="lyranetwork.lyra.command_handler.sylius_payment_status" class="Lyranetwork\Lyra\CommandHandler\StatusPaymentRequestHandler">
+            <argument type="service" id="sylius.provider.payment_request" />
+            <argument type="service" id="sylius_abstraction.state_machine" />
+            <argument type="service" id="monolog.logger.lyra" />
+            <argument type="service" id="request_stack" />
             <argument type="service" id="Lyranetwork\Lyra\Service\ConfigService" />
-            <argument type="service" id="Lyranetwork\Lyra\Service\OrderService" />
-            <argument type="service" id="Lyranetwork\Lyra\Repository\PaymentMethodRepositoryInterface" />
             <argument type="service" id="translator" />
-            <argument type="service" id="sylius.context.locale" />
-            <argument type="service" id="router" />
-            <argument type="service" id="sylius_abstraction.state_machine"/>
+            <tag name="messenger.message_handler" bus="sylius.payment_request.command_bus"/>
+        </service>
+
+        <service id="lyranetwork.lyra.command_provider.sylius_payment_notify" class="Lyranetwork\Lyra\CommandProvider\NotifyPaymentRequestCommandProvider">
+            <tag name="lyranetwork.lyra.command_provider.lyra_sylius_payment" action="notify"/>
+        </service>
+
+        <service id="lyranetwork.lyra.command.sylius_payment_notify" class="Lyranetwork\Lyra\Command\NotifyPaymentRequest">
+        </service>
+
+        <service id="lyranetwork.lyra.command_handler.sylius_payment_notify" class="Lyranetwork\Lyra\CommandHandler\NotifyPaymentRequestHandler">
+            <argument type="service" id="sylius.provider.payment_request" />
+            <argument type="service" id="sylius_abstraction.state_machine" />
+            <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
+            <argument type="service" id="monolog.logger.lyra" />
+            <tag name="messenger.message_handler" bus="sylius.payment_request.command_bus" handles="Lyranetwork\Lyra\Command\NotifyPaymentRequest"/>
+        </service>
+
+        <service id="lyranetwork.lyra.provider.order_pay.http_response.sylius_payment" class="Sylius\Bundle\PaymentBundle\Provider\ActionsHttpResponseProvider">
+            <argument type="tagged_locator" tag="lyranetwork.lyra.provider.http_response.sylius_payment" index-by="action"/>
+            <tag name="sylius.payment_request.provider.http_response" gateway-factory="lyra_sylius_payment"/>
+        </service>
+
+        <service id="lyranetwork.lyra.provider.order_pay.http_response.sylius_payment.capture" class="Lyranetwork\Lyra\OrderPay\Provider\CaptureHttpResponseProvider">
+            <argument type="service" id="twig" />
+            <argument type="service" id="sylius_shop.provider.order_pay.after_pay_url" />
+            <tag name="lyranetwork.lyra.provider.http_response.sylius_payment" action="capture" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Provider\LyraNotifyPaymentProvider">
+            <argument type="service" id="sylius.repository.payment_request" />
+            <argument type="service" id="monolog.logger.lyra" />
+            <argument type="service" id="Lyranetwork\Lyra\Sdk\RestData" />
+            <argument type="service" id="sylius_abstraction.state_machine" />
+            <tag name="sylius.payment_request.payment_notify_provider" />
+        </service>
+
+        <service id="Lyranetwork\Lyra\Provider\LyraNotifyResponseProvider"
+                 class="Lyranetwork\Lyra\Provider\LyraNotifyResponseProvider"
+                 decorates="sylius.provider.payment_request.notify_response">
+            <argument type="service" id="Lyranetwork\Lyra\Provider\LyraNotifyResponseProvider.inner" />
+            <argument type="service" id="monolog.logger.lyra" />
         </service>
     </services>
 </container>

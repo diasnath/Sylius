@@ -1,7 +1,7 @@
 {
-	"name" : "lyranetwork/sylius-lyranetwork-plugin",
+	"name" : "ndias/sylius-ndias-plugin",
 	"description" : "This plugin enables you to setup the Lyra Collect payment gateway on your Sylius website.",
-	"version" : "2.0.0-beta1",
+	"version" : "3.0.0",
 	"type" : "sylius-plugin",
 	"keywords" : [
 		"sylius",
@@ -60,11 +60,18 @@
 			"symfony/flex" : true
 		}
 	},
-	"extra" : {
-		"symfony" : {
-			"require" : "^5.4 || ^6.0"
-		}
-	},
+ "extra" : {
+        "symfony" : {
+            "require" : "^5.4 || ^6.0",
+            "recipe": {
+                "bundles": {
+                    "Lyranetwork\\Lyra\\LyranetworkLyraPlugin": [
+                        "all"
+                    ]
+                }
+            }
+        }
+    },
 	"autoload" : {
 		"psr-4" : {
 			"Lyranetwork\\Lyra\\" : "LyranetworkLyra/src/",

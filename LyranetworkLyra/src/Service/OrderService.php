@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace Lyranetwork\Lyra\Service;
 
-use Lyranetwork\Lyra\Repository\OrderRepositoryInterface;
-
 use Sylius\Bundle\CoreBundle\Mailer\OrderEmailManagerInterface;
 use App\Entity\Payment\Payment;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -24,10 +22,6 @@ use Psr\Log\LoggerInterface;
 
 class OrderService
 {
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
 
     /**
      * @var OrderEmailManagerInterface
@@ -40,24 +34,12 @@ class OrderService
     private $logger;
 
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
         OrderEmailManagerInterface $orderEmailManager,
         LoggerInterface $logger
     )
     {
-        $this->orderRepository = $orderRepository;
         $this->orderEmailManager = $orderEmailManager;
         $this->logger = $logger;
-    }
-
-    public function get(string $orderId)
-    {
-        return $this->orderRepository->findOneByOrderId($orderId);
-    }
-
-    public function getByNumber(string $orderNumber)
-    {
-        return $this->orderRepository->findOneByNumber($orderNumber);
     }
 
     public function sendConfirmationEmail(Payment $payment): void
@@ -77,10 +59,5 @@ class OrderService
         } catch (TransportException $e) {
             $this->logger->error($e->getMessage());
         }
-    }
-
-    public function getByTokenValue($tokenValue)
-    {
-        return $this->orderRepository->findOneByTokenValue($tokenValue);
     }
 }

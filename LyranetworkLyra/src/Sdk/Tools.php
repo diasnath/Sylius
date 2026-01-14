@@ -30,7 +30,7 @@ class Tools
 
     private static $CMS_IDENTIFIER = 'Sylius_2.x';
     private static $SUPPORT_EMAIL = 'https://support.lyra.com/hc/fr/requests/new';
-    private static $PLUGIN_VERSION = '2.0.0-beta1';
+    private static $PLUGIN_VERSION = '2.2.0-beta1';
     private static $GATEWAY_VERSION = 'V2';
     private static $REST_URL = 'https://api.lyra.com/api-payment/';
     private static $STATIC_URL = 'https://static.lyra.com/static/';

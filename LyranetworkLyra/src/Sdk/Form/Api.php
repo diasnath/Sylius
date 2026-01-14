@@ -246,12 +246,13 @@ class Api
             'PASS_BEAU_CDX_SB' => 'Carte Cadeau Passion Beauté (sandbox)', 'PAYCONIQ' => 'Payconiq', 'PAYDIREKT' => 'Paydirekt',
             'PAYPAL' => 'PayPal', 'PAYPAL_BNPL' => 'PayPal Pay Later', 'PAYPAL_BNPL_SB' => 'PayPal Pay Later Sandbox',
             'PAYPAL_SB' => 'PayPal Sandbox', 'PICWIC' => 'Carte Picwic', 'PICWIC_SB' => 'Carte Picwic (sandbox)',
-            'POSTFINANCE' => 'PostFinance Card', 'POSTFINANCE_EFIN' => 'PostFinance E-Finance', 'PRESTO' => 'Presto',
+            'PIX' => 'Pix', 'POSTFINANCE' => 'PostFinance Card', 'POSTFINANCE_EFIN' => 'PostFinance E-Finance',
             'PRZELEWY24' => 'Przelewy24', 'RABBIT_LINE_PAY' => 'Rabbit Line Pay', 'S-MONEY' => 'S-money',
             'SAMSUNG_PAY' => 'Samsung Pay', 'SCT' => 'Virement SEPA',
             'SDD' => 'SEPA direct debit', 'SODEXO' => 'Pass Restaurant', 'SOFORT_BANKING' => 'Sofort', 'SOROCRED' => 'Sorocred',
-            'TNG' => 'Touch \'n Go eWallet', 'TOSS' => 'Toss', 'TRUEMONEY' => 'TrueMoney Wallet',
-            'UPI' => 'UPI', 'VILLAVERDE' => 'Carte Cadeau VillaVerde', 'VILLAVERDE_SB' => 'Carte Cadeau VillaVerde (sandbox)', 'WECHAT' => 'WeChat Pay'
+            'TNG' => 'Touch \'n Go eWallet', 'TOSS' => 'Toss', 'TRUEMONEY' => 'TrueMoney Wallet', 'TWINT' => 'Twint',
+            'UPI' => 'UPI', 'VILLAVERDE' => 'Carte Cadeau VillaVerde', 'VILLAVERDE_SB' => 'Carte Cadeau VillaVerde (sandbox)',
+            'WECHAT' => 'WeChat Pay', 'WECHAT_PAY' => 'WeChat Pay'
         );
     }
 

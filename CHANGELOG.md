@@ -1,2 +1,2 @@
-# 2.0.0, 2025-07-20:
-- New plugin for Sylius 2.x.
+# 3.0.0, 2026-01-01:
+- New plugin for Sylius 2.x using payment request.

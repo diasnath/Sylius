@@ -63,10 +63,6 @@ sylius_twig_hooks:
       name:
         template: '@LyranetworkLyraPlugin/admin/order/payment_details.html.twig'
         priority: 150
-    'sylius_admin.order.show.content.sections.payments.item.actions':
-      refund:
-        template: '@LyranetworkLyraPlugin/admin/order/payment_action_refund.html.twig'
-        priority: 150
     'sylius_admin.payment_method.create.content.form.sections':
       general:
         template: '@LyranetworkLyraPlugin/admin/payment_method/general.html.twig'

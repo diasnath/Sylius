@@ -96,31 +96,16 @@ class RestData
         return $this->configService->get(GatewayConfiguration::$REST_FIELDS . $hmacKey, $instanceCode);
     }
 
-    public function getToken($order, $instanceCode)
+    public function getToken($order, $instanceCode, $paymentRequestHash)
     {
-        $params = $this->getRestApiFormTokenData($order, $instanceCode);
-
-        $lastTokenData = $this->requestStack->getSession()->get('lastTokenData');
-        $lastToken = $this->requestStack->getSession()->get('lastToken');
-
-        $tokenData = base64_encode(serialize($params));
-        if ($lastToken && $lastTokenData && ($lastTokenData === $tokenData)) {
-            $this->logger->info("Cart data did not change since last payment attempt, use last created token for order #{$order->getNumber()}");
-
-            return $lastToken;
-        }
+        $params = $this->getRestApiFormTokenData($order, $instanceCode, $paymentRequestHash);
 
         $this->logger->info("Creating form token for order #{$order->getNumber()} with parameters: {$params}");
 
         try {
             $metadata = "order #{$order->getNumber()}";
 
-            $token = $this->createFormToken($params, $metadata, $instanceCode);
-
-            $this->requestStack->getSession()->set('lastTokenData', $tokenData);
-            $this->requestStack->getSession()->set('lastToken', $token);
-
-            return $token;
+            return $this->createFormToken($params, $metadata, $instanceCode);
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
 
@@ -322,7 +307,7 @@ class RestData
         return ($hash === $data->get('kr-hash'));
     }
 
-    private function getRestApiFormTokenData($order, $instanceCode)
+    private function getRestApiFormTokenData($order, $instanceCode, $paymentRequestHash)
     {
         if (! $order || ! $order->getNumber()) {
             $this->logger->error('Cannot create a form token. Empty cart passed');
@@ -364,7 +349,6 @@ class RestData
                     'category' => $request->get('cust_status')
                 ],
                 'shoppingCart' => [
-                    'shippingAmount' => $request->get('shipping_amount'),
                     'cartItemInfo' => $this->getCartData($request)
                 ]
             ],
@@ -378,12 +362,18 @@ class RestData
             'amount' => $request->get('amount'),
             'metadata' => [
                 'db_order_id'=> $order->getId(),
-                'db_method_code' => $instanceCode
+                'db_method_code' => $instanceCode,
+                'paymentRequestHash' => $paymentRequestHash
             ]
         ];
 
         if ($request->get('tax_amount')) {
             $data['customer']['shoppingCart']['taxAmount'] = $request->get('tax_amount');
+        }
+
+        $shippingAmount = $request->get('shipping_amount');
+        if (! empty($shippingAmount) && $shippingAmount !== '0') {
+            $data['customer']['shoppingCart']['shippingAmount'] = $shippingAmount;
         }
 
         // In case of Smartform, only payment means supporting capture delay will be shown.
@@ -460,7 +450,6 @@ class RestData
             // Misc data.
             'currency' => $lyraCurrency->getAlpha3(),
             'language' => $lang,
-            'url_return' => $this->router->generate('lyra_return_url', [], UrlGenerator::ABSOLUTE_URL),
 
             // Customer info.
             'cust_id' => $customer->getId(),

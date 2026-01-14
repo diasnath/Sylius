@@ -3,8 +3,8 @@ sylius_lyra_plugin:
     lyra_payment_method_title: Pago con Lyra Collect
     lyra_developed_by: Desarrollado por
     lyra_support_email: 'Contáctenos: '
+    lyra_click_here: 'Haga clic aquí'
     lyra_module_version: 'Versión del módulo: '
-    lyra_gateway_version: 'Versión del portal: '
     lyra_documentation_link: 'Haga clic para ver la documentación de la configuración del módulo: '
     lyra_advanced_options: OPCIONES AVANZADAS
     lyra_payment_options: OPCIONES DE PAGO
@@ -39,16 +39,16 @@ sylius_lyra_plugin:
       label: URL del cliente JavaScript
     lyra_card_data_entry_mode:
       label: Modo de ingreso de datos de pago
-      helptext: Seleccione la forma en que se ingresarán los datos de pago. Atención, para usar lel Smartform, debe asegurarse de estar suscrito a esta opción con Lyra Collect.
+      helptext: Seleccione la forma en que se ingresarán los datos de pago. Atención, para usar los campos de pago incrustados, debe asegurarse de estar suscrito a esta opción con Lyra Collect.
     lyra_rest_popin_mode:
       label: Mostrar en una ventana pop-in
-      helptext: Esta opción permite mostrar el Smartform en una ventana pop-in.
+      helptext: Esta opción permite mostrar los campos de pago incrustados en una ventana pop-in.
     lyra_rest_theme:
       label: Tema
-      helptext: Seleccione un tema para usar para mostrar el Smartform.
+      helptext: Seleccione un tema para usar para mostrar los campos de pago incrustados
     lyra_rest_compact_mode:
       label: Modo compacto
-      helptext: Esta opción muestra el Smartform en modo compacto.
+      helptext: Esta opción muestra los campos de pago incrustados en modo compacto.
     lyra_capture_delay:
       label: Plazo de captura (si es aplicable)
       helptext: El número de días antes de la captura del pago (ajustable en su Back Office Lyra Expert).
@@ -73,9 +73,9 @@ sylius_lyra_plugin:
     test: TEST
     production: PRODUCTION
     smartform:
-      mode_smartform: Smartform incorporado en el sitio web vendedor (API REST)
-      mode_smartform_ext_with_logos: Smartform extendido incorporado en el sitio web vendedor con los logotipos (API REST)
-      mode_smartform_ext_without_logos: Smartform extendido incorporado en el sitio web vendedor sin los logotipos (API REST)
+      mode_smartform: Campos de pago incrustados en el sitio web vendedor (API REST)
+      mode_smartform_ext_with_logos: Campos de pago extendidos incrustados en el sitio web vendedor con los logotipos (API REST)
+      mode_smartform_ext_without_logos: Campos de pago extendidos incrustados en el sitio web vendedor sin los logotipos (API REST)
     theme:
       neon: Neon
       classic: Classic

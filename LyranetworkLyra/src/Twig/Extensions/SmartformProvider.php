@@ -84,17 +84,11 @@ class SmartformProvider extends AbstractExtension
         ];
     }
 
-    public function getSmartformToken($order, $instanceCode): array
+    public function getSmartformToken($order, $instanceCode, $paymentRequestHash): array
     {
         $this->logger->info("Start retrieving smartform token for payment page.");
 
-        if ($this->stateMachine->can($order, OrderTransitions::GRAPH, OrderTransitions::TRANSITION_CREATE)) {
-            $this->stateMachine->apply($order, OrderTransitions::GRAPH, OrderTransitions::TRANSITION_CREATE);
-        }
-
-        $order = $this->orderService->get(strval($order->getId()));
-
-        $token = $this->restData->getToken($order, $instanceCode);
+        $token = $this->restData->getToken($order, $instanceCode, $paymentRequestHash);
 
         return [
             'formToken' => $token

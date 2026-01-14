@@ -34,4 +34,20 @@ final class LyranetworkLyraExtension extends Extension
     {
         return new Configuration();
     }
+
+    public function prepend(ContainerBuilder $container): void
+    {
+        $container->prependExtensionConfig('monolog', [
+            'channels' => ['lyra'],
+            'handlers' => [
+                'lyra' => [
+                    'type' => 'stream',
+                    'path' => '%kernel.logs_dir%/lyra.log',
+                    'level' => 'info',
+                    'channels' => ['lyra'],
+                    'bubble' => false,
+                ],
+            ],
+        ]);
+    }
 }

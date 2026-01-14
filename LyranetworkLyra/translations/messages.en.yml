@@ -3,8 +3,8 @@ sylius_lyra_plugin:
     lyra_payment_method_title: Payment by Lyra Collect
     lyra_developed_by: Developed by
     lyra_support_email: 'Contact us: '
+    lyra_click_here: 'Click here'
     lyra_module_version: 'Module version: '
-    lyra_gateway_version: 'Gateway version: '
     lyra_documentation_link: 'Click to view the module configuration documentation: '
     lyra_advanced_options: ADVANCED OPTIONS
     lyra_payment_options: PAYMENT OPTIONS
@@ -39,16 +39,16 @@ sylius_lyra_plugin:
       label: JavaScript client URL
     lyra_card_data_entry_mode:
       label: Payment data entry mode
-      helptext: Select how the payment data will be entered. Attention, to use the Smartform, you must ensure that you have subscribed to this option with Lyra Collect.
+      helptext: Select how the payment data will be entered. Attention, to use embedded payment fields, you must ensure that you have subscribed to this option with Lyra Collect.
     lyra_rest_popin_mode:
       label: Display in a pop-in
-      helptext: This option allows to display the Smartform in a pop-in.
+      helptext: This option allows to display the embedded payment fields in a pop-in.
     lyra_rest_theme:
       label: Theme
-      helptext: Select a theme to use to display the Smartform.
+      helptext: Select a theme to use to display the embedded payment fields.
     lyra_rest_compact_mode:
       label: Compact mode
-      helptext: This option allows to display the Smartform in a compact mode.
+      helptext: This option allows to display the embedded payment fields in a compact mode.
     lyra_capture_delay:
       label: Capture delay (if applicable)
       helptext: The number of days before the bank capture (adjustable in your Lyra Expert Back Office).
@@ -73,9 +73,9 @@ sylius_lyra_plugin:
     test: TEST
     production: PRODUCTION
     smartform:
-      mode_smartform: Embedded Smartform on merchant site (REST API)
-      mode_smartform_ext_with_logos: Embedded Smartform extended on merchant site with logos (REST API)
-      mode_smartform_ext_without_logos: Embedded Smartform extended on merchant site without logos (REST API)
+      mode_smartform: Embedded payment fields on merchant site (REST API)
+      mode_smartform_ext_with_logos: Embedded payment fields extended on merchant site with logos (REST API)
+      mode_smartform_ext_without_logos: Embedded payment fields extended on merchant site without logos (REST API)
     theme:
       neon: Neon
       classic: Classic

@@ -93,7 +93,7 @@ final class SyliusGatewayConfigurationType extends AbstractType
             'disabled' => true,
             'help' => $this->PREFIX . 'ui.lyra_rest_check_url.helptext',
             'required' => false,
-            'data' => $this->router->generate('lyra_rest_ipn', [], UrlGenerator::ABSOLUTE_URL)
+            'data' => $this->router->generate('sylius_payment_method_notify', ["code" => "LYRA"], UrlGenerator::ABSOLUTE_URL)
         ])
         ->add(self::$REST_FIELDS . 'private_test_key', PasswordType::class, [
             'label' => $this->PREFIX . 'ui.lyra_private_test_key.label',

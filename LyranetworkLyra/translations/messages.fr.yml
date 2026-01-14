@@ -3,8 +3,8 @@ sylius_lyra_plugin:
     lyra_payment_method_title: Paiement par Lyra Collect
     lyra_developed_by: Développé par
     lyra_support_email: 'Courriel de contact: '
+    lyra_click_here: 'Cliquez ici'
     lyra_module_version: 'Version du module: '
-    lyra_gateway_version: 'Version de la plateforme: '
     lyra_documentation_link: 'Cliquer pour accéder à la documentation de configuration du module: '
     lyra_advanced_options: OPTIONS AVANCÉES
     lyra_payment_options: OPTIONS DE PAIEMENT
@@ -39,16 +39,16 @@ sylius_lyra_plugin:
       label: URL du client JavaScript
     lyra_card_data_entry_mode:
       label: Mode de saisie des données de paiement
-      helptext: Sélectionner la manière dont seront saisies les données de paiement. Attention, pour utiliser le Smartform, vous devez vous assurer d'avoir souscrit à cette option auprès de Lyra Collect.
+      helptext: Sélectionner la manière dont seront saisies les données de paiement. Attention, pour utiliser les champs de paiement embarqués, vous devez vous assurer d'avoir souscrit à cette option auprès de Lyra Collect.
     lyra_rest_popin_mode:
       label: Afficher dans une pop-in
-      helptext: Cette option permet d'afficher le Smartform dans une pop-in.
+      helptext: Cette option permet d'afficher les champs de paiement embarqués dans une pop-in.
     lyra_rest_theme:
       label: Thème
-      helptext: Sélectionnez le thème à utiliser pour le Smartform.
+      helptext: Sélectionnez le thème à utiliser pour les champs de paiement embarqués.
     lyra_rest_compact_mode:
       label: Mode compact
-      helptext: Cette option permet d'afficher le Smartform en mode compact.
+      helptext: Cette option permet d'afficher les champs de paiement embarqués en mode compact.
     lyra_capture_delay:
       label: Délai avant remise en banque (si applicable)
       helptext: Le nombre de jours avant la remise en banque (paramétrable sur votre Back Office Lyra Expert).
@@ -73,9 +73,9 @@ sylius_lyra_plugin:
     test: TEST
     production: PRODUCTION
     smartform:
-      mode_smartform: Smartform embarqué sur le site marchand (API REST)
-      mode_smartform_ext_with_logos: Smartform étendu embarqué sur le site marchand avec les logos (API REST)
-      mode_smartform_ext_without_logos: Smartform étendu embarqué sur le site marchand sans les logos (API REST)
+      mode_smartform: Champs de paiement embarqués sur le site marchand (API REST)
+      mode_smartform_ext_with_logos: Champs de paiement étendus embarqués sur le site marchand avec les logos (API REST)
+      mode_smartform_ext_without_logos: Champs de paiement étendus embarqués sur le site marchand sans les logos (API REST)
     theme:
       neon: Neon
       classic: Classic
